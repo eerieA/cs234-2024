@@ -53,4 +53,4 @@ Running this scripts requires you have run all method for specified ENV and SEED
 
 e.g.
 
-![results-cartpole](code\results\results-cartpole.png)
+![](code\results\results-cartpole.png)
