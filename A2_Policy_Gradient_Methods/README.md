@@ -53,4 +53,4 @@ Running this scripts requires you have run all method for specified ENV and SEED
 
 e.g.
 
-![results-cartpole](A2_Policy_Gradient_Methods\code\results\results-cartpole.png)
+![results-cartpole](code\results\results-cartpole.png)
