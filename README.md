@@ -1,5 +1,5 @@
 # CS234_Reinforcement_Learning
-<img src="RL.jpg" alt="drawing" style="width:200px;"/>\
+![](Fig/RL.jpg)
 This repo mainly contains CS234 2024spring assignment's coding problems. The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials.
 
 I mainly submit coding problems, you can follow the instructions in each problem directory to finish it.
