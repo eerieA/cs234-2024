@@ -1,5 +1,5 @@
 # CS234_Reinforcement_Learning
-![](Fig/RL.png)\
+![](Fig/RL.png)
 
 This repo mainly contains CS234 2024spring assignment's coding problems. The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials.
 
