@@ -1,9 +1,9 @@
 # CS234_Reinforcement_Learning
 ![](Fig/RL.png)
 
-This repo mainly contains CS234 2024spring assignment's coding problems. The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials.
+This repo mainly contains Stanford CS234 2024spring assignment's coding problems. The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials.
 
-I mainly submit coding problems, you can follow the instructions in each problem directory to finish it.
+Feel free to follow the instructions in each problem directory to run and test it.
 ## A1_P4: RiverSwim MDP
 
 ![](A1_RiverSwim_MDP/RiverSwim_MDP.png)
