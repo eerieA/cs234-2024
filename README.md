@@ -16,23 +16,17 @@ I mainly submit coding problems, you can follow the instructions in each problem
 
 ### PPO (without early termination)
 
-<video src="A3_RLHF_DPO/results/Hopper-v3-early-termination=False-seed=1/video.mp4"></video>
-
-
-
-
+![](A3_RLHF_DPO/results/Hopper-v3-early-termination=False-seed=1/video.gif)
 
 
 
 ### PPO(with early termination)
 
-<video src="A3_RLHF_DPO/results/Hopper-v3-early-termination=True-seed=1/video.mp4"></video>
+![](A3_RLHF_DPO/results/Hopper-v3-early-termination=True-seed=1/video.gif)
 
 ### RLHF
 
-<video src="A3_RLHF_DPO/results_rlhf/Hopper-v3-rlhf-seed=0/video.mp4"></video>
-
-
+![](A3_RLHF_DPO/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif)
 
 
 
