@@ -6,7 +6,7 @@ This repo mainly contains CS234 2024spring assignment's coding problems. The off
 I mainly submit coding problems, you can follow the instructions in each problem directory to finish it.
 ## A1_P4: RiverSwim MDP
 
-![](A1_RiverSwim_MDP/RiverSwim MDP.png)
+![](A1_RiverSwim_MDP/RiverSwim_MDP.png)
 
 ## A2_P2: Policy Gradient Methods
 
