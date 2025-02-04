@@ -1,4 +1,4 @@
-# CS234_Reinforcement_Learning
+# CS234_Reinforcement_Learning (Spring 2024)
 ![](Fig/RL.png)
 
 This repo mainly contains Stanford CS234 2024spring assignment's coding problems. The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials.
@@ -28,8 +28,3 @@ Feel free to follow the instructions in each problem directory to run and test i
 
 ![](A3_RLHF_DPO/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif)
 
-
-
-
-
-Some key points are written in my [blog](https://www.zhihu.com/column/c_1787437165808025601)
