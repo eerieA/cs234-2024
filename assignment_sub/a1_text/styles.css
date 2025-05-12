@@ -1,0 +1,24 @@
+.answer {
+  color: #0077b6;
+  padding-left: 0px;
+}
+
+.answer-cont {
+  color: #0077b6;
+  padding-left: 2em;
+}
+
+ol {
+  list-style-type: lower-alpha;
+}
+
+.ol-deci {
+  list-style-type: decimal;
+}
+
+.note {
+  color: #0077b6;
+  font-style: italic;
+  padding: 0px 10px 0px 10px;
+  border-left: 1px dashed #0077b6;
+}

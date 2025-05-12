@@ -1,0 +1,53 @@
+---
+title: "A1"
+bibliography: references.bib
+format:
+  html: 
+    css: styles.css
+    number-sections: true
+---
+
+## Effect of Effective Horizon [8 pts]
+
+Consider an agent managing inventory for a store, which is represented as an MDP. The stock level $s$ refers to the number of items currently in stock (between 0 and 10, inclusive). At any time, the agent has two actions: sell (decrease stock by one, if possible) or buy (increase stock by one, if possible).
+
+- If $s > 0$ and the agent sells, it receives +1 reward for the sale and the stock level transitions to $s - 1$. If $s = 0$, nothing happens.
+- If $s < 9$ and the agent buys, it receives no reward and the stock level transitions to $s + 1$.
+- The owner of the store likes to see a fully stocked inventory at the end of the day, so the agent is rewarded with $+100$ if the stock level ever reaches the maximum level $s = 10$.
+- $s = 10$ is also a terminal state and the problem ends if it is reached.
+
+The reward function, denoted as $r(s, a, s')$, can be summarized concisely as follows:
+
+- $r(s,\text{sell}, s-1) = 1$ for $s > 0$ and $r(0,\text{sell},0) = 0$
+- $r(s, \text{buy}, s+1) = 0$ for $s < 9$ and $r(9, \text{buy}, 10) = 100$. The last condition indicates that transitioning from $s = 9$ to $s = 10$ (fully stocked) yields $+100$ reward.
+
+The stock level is assumed to always start at $s = 3$ at the beginning of the day. We will consider how the agent's optimal policy changes as we adjust the finite horizon $H$ of the problem. Recall that the horizon $H$ refers to a limit on the number of time steps the agent can interact with the MDP before the episode terminates, regardless of whether it has reached a terminal state. We will explore properties of the optimal policy (the policy that achieves highest episode reward) as the horizon $H$ changes.
+
+Consider, for example, $H = 4$. The agent can sell for three steps, transitioning from $s = 3$ to $s = 2$ to $s = 1$ to $s = 0$ receiving rewards $+1$, $+1$, and $+1$ for each sell action. At the fourth step, the inventory is empty so it can sell or buy, receiving no reward regardless. Then the problem terminates since time has expired.
+
+**Questions**:
+
+a. Starting from the initial state $s = 3$, is it possible to choose a value of $H$ that results in the optimal policy taking both buy and sell steps during its execution? Explain why or why not. [2 pts]
+
+b. In the infinite-horizon discounted setting, is it possible to choose a fixed value of $\gamma \in [0, 1)$ such that the optimal policy starting from $s = 3$ never fully stocks the inventory? You do not need to propose a specific value, but simply explain your reasoning either way. [2 pts]
+
+c. Does there **ever** exist a $\gamma$ such that the optimal policy for a MDP with a gamma is the same as a MDP with a finite horizon $H$? Please give an example of a particular $\gamma$ if there exists one. [2 pts]
+
+d. Does there **always** exist a $\gamma$ such that the optimal policy for the MDP with $\gamma$ is the same as an MDP with finite horizon $H$? Please provide a discussion (1-2 sentences) describing your reasoning. [2 pts]
+
+
+<div class="answer">
+
+Answers:
+
+a. Overall it is. Intuitively if $\gamma = 1$, it is not possible, because the reward at $s=9$ with action buy has a high reward $+100$, and the median reward $+1$ happens in a "one direction" fashion. There are no ties. With this trend, it is natrual to feel that the agent, starting from $s=3$, would either always buy to get that high reward, or always sell to get some median rewards. And indeed with the insight of $10-3=7$, we can divide finite $H$ into 2 cases: $0 \le H < 7$ and $H \ge 7$. For the first case the agent cannot see the big reward and will always sell, for the second case the agent will always buy until $s=10$ and stays there.
+<br>
+However, if $\gamma < 1$, it is possible. Because if the weight of the biggest reward is significantly lighter, then the agent will be motivated to sell for some nearer rewards, then buy to reach $s=10$. For example when $\gamma=0.5$, we can find $H=9$ that motivates the agent to sell 1 step first then buy for 8 steps.
+
+b. Yes. Similar with the example proposed in a, if $\gamma$ is very small then the agent will be attracted by nearer rewards that will be gained by selling, and continue selling at $s=0$, thus never fully stocking.
+
+c. Yes. As an extreme example, for a discounted MDP with infinite horizon we can set $\gamma=0$, then for a non-discounted MDP with finite horizon we set $H=1$, then these two MDPs will result in the same optimal strategy.
+
+d. No. The finite horizon MDPs' optimal policies are horizon dependent, but the infinite horizon MDPs' are not, so there are cases where no $\gamma$ can make an infinite horizon MDP produce the same optimal policies as a finite one. Using the setting in this problem, the optimal policy under $H=9$ can be either all sell or first sell then buy, but with infinite horizon the optimal policy is fixed with a fixed $\gamma$. More generally speaking, there is not a one-to-one mapping from a finite horizon $H$ to some discount factor $\gamma$.
+
+</div>

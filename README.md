@@ -2,13 +2,13 @@
 
 <img alt="Course cover image" src="./Fig/RL.png" width="300">
 
-This repo contains Stanford CS234 **2024 spring** assignment's coding problems, and some personally taken notes after watching the [free video lectures on Youtube](https://www.youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX). The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials for the **latest** offering, for example, winter 2025. So please be advised that the assignments here might not match the latest course material exactly.
+This repo contains Stanford CS234 **2024 spring** assignment's coding problems (as claimed by the original repo owner), and some personally taken notes after watching the [free video lectures on Youtube](https://www.youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX). The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials for the **latest** offering, for example, winter 2025. So please be advised that the assignments here might not match the latest course material exactly.
 
 Feel free to follow the instructions in each problem directory to run and test it.
 
 ### Disclaimer
 
-The *assignment_sub* folder in this repo contains personal attempts at solving the assignment problems, not guarateed to be correct at all.
+The *assignment_sub* folder in this repo contains personal attempts at solving the assignment problems (written as [Quarto](https://quarto.org/) docs), not guarateed to be correct at all.
 
 ## Assignments
 
