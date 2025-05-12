@@ -1,30 +1,36 @@
 # CS234_Reinforcement_Learning (Spring 2024)
-![](Fig/RL.png)
 
-This repo mainly contains Stanford CS234 2024spring assignment's coding problems. The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials.
+<img alt="Course cover image" src="./Fig/RL.png" width="300">
+
+This repo contains Stanford CS234 **2024 spring** assignment's coding problems, and some personally taken notes after watching the [free video lectures on Youtube](https://www.youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX). The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials for the **latest** offering, for example, winter 2025. So please be advised that the assignments here might not match the latest course material exactly.
 
 Feel free to follow the instructions in each problem directory to run and test it.
+
+### Disclaimer
+
+The *assignment_sub* folder in this repo contains personal attempts at solving the assignment problems, not guarateed to be correct at all.
+
+## Assignments
+
 ## A1_P4: RiverSwim MDP
 
-![](A1_RiverSwim_MDP/RiverSwim_MDP.png)
+<img alt="A1 problem 4 figure" src="./A1_code/RiverSwim_MDP.png" width="600">
 
 ## A2_P2: Policy Gradient Methods
 
-![results-cartpole](A2_Policy_Gradient_Methods/code/results/results-cartpole.png)
+<img alt="A2 problem 2 figure" src="./A2_code/code/results/results-cartpole.png" width="300">
 
 ## A3_P1-P3: Reward engineering, Learning from preferences(RLHF), Direct preference optimization(DPO)
 
 ### PPO (without early termination)
 
-![](A3_RLHF_DPO/results/Hopper-v3-early-termination=False-seed=1/video.gif)
-
-
+<img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="300">
 
 ### PPO(with early termination)
 
-![](A3_RLHF_DPO/results/Hopper-v3-early-termination=True-seed=1/video.gif)
+<img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="300">
 
 ### RLHF
 
-![](A3_RLHF_DPO/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif)
+<img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="300">
 
