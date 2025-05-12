@@ -1,6 +1,9 @@
 ---
 title: "A1"
 bibliography: references.bib
+execute:
+  enabled: true
+  cache: true
 format:
   html: 
     css: styles.css
@@ -42,9 +45,64 @@ Answers:
 
 a. Overall it is. Intuitively if $\gamma = 1$, it is not possible, because the reward at $s=9$ with action buy has a high reward $+100$, and the median reward $+1$ happens in a "one direction" fashion. There are no ties. With this trend, it is natrual to feel that the agent, starting from $s=3$, would either always buy to get that high reward, or always sell to get some median rewards. And indeed with the insight of $10-3=7$, we can divide finite $H$ into 2 cases: $0 \le H < 7$ and $H \ge 7$. For the first case the agent cannot see the big reward and will always sell, for the second case the agent will always buy until $s=10$ and stays there.
 <br>
-However, if $\gamma < 1$, it is possible. Because if the weight of the biggest reward is significantly lighter, then the agent will be motivated to sell for some nearer rewards, then buy to reach $s=10$. For example when $\gamma=0.5$, we can find $H=9$ that motivates the agent to sell 1 step first then buy for 8 steps.
+However, if $\gamma < 1$, it is possible. Because if the weight of the biggest reward is significantly lighter, then the agent will be motivated to sell for some nearer rewards, then buy to reach $s=10$. For example when $\gamma=0.5$, we can find $H=9$ that motivates the agent to sell first then buy until reaching $s=10$.
 
-b. Yes. Similar with the example proposed in a, if $\gamma$ is very small then the agent will be attracted by nearer rewards that will be gained by selling, and continue selling at $s=0$, thus never fully stocking.
+</div>
+
+:::{.callout-tip title="Python function for calculation" collapse=true}
+<div class="answer-cont">
+
+```{python}
+# Policy comparison: sell x times, then buy until s = 10
+gamma = 0.5
+H = 9
+start_stock = 3
+max_stock = 10
+fs_reward = 100 # Final state (10) reward
+
+def discounted_reward(x, gamma):
+    """
+    Calculate total discounted reward for:
+    - Selling x times, each gives +1,
+    - Then buying for 10-x+1 steps to reach s=10 (x <= 2).
+    - Expecting to receive +100 at the step reaching s=10.
+    """
+    if x > H:
+        return float('-inf')  # not feasible
+    steps_needed_to_reach_10 = max_stock - start_stock
+    if x + steps_needed_to_reach_10 > H:
+        return float('-inf')  # can't reach s=10 in time
+
+    # Step 1: Expected reward from selling x times
+    reward = sum([gamma**t for t in range(x)])
+
+    # Step 2: Expected reward from buying to reach s=10
+    terminal_step = x + steps_needed_to_reach_10 - 1
+    reward += gamma**terminal_step * fs_reward
+    return reward
+```
+
+</div>
+:::
+
+<div class="answer-cont">
+
+```{python}
+print(f"Gamma = {gamma}, Horizon H = {H}")
+print("Sell steps (x) | Total Expected Reward")
+print("-" * 35)
+for x in range(H + 1):
+    val = discounted_reward(x, gamma)
+    if val != float('-inf'):
+        print(f"{x:^14} | {val:.4f}")
+```
+
+Note that the `Sell steps (0)` above indicates the all buy policy.
+</div>
+
+<div class="answer">
+
+b. Yes. Similar with the example proposed in a, if $\gamma$ is very small then the agent will be attracted by nearer rewards that will be gained by selling, and continue oscillating between selling and buying at low $s$ states, thus never fully stocking.
 
 c. Yes. As an extreme example, for a discounted MDP with infinite horizon we can set $\gamma=0$, then for a non-discounted MDP with finite horizon we set $H=1$, then these two MDPs will result in the same optimal strategy.
 
