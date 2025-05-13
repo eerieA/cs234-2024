@@ -6,6 +6,10 @@ This repo contains Stanford CS234 **2024 spring** assignment's coding problems (
 
 Feel free to follow the instructions in each problem directory to run and test it.
 
+### Attribution
+
+Based on https://github.com/Rhyme0730/CS234-Reinforcement-Learning . Commits on and before Feb 4, 2025 were all made by the owner of that repo. Please consider forking that repo if you don't need to make your own independent commits.
+
 ### Disclaimer
 
 The *assignment_sub* folder in this repo contains personal attempts at solving the assignment problems (written as [Quarto](https://quarto.org/) docs), not guarateed to be correct at all.
