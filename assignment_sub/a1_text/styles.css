@@ -22,3 +22,8 @@ ol {
   padding: 0px 10px 0px 10px;
   border-left: 1px dashed #0077b6;
 }
+
+/* Only on figcaption elements that are immediate children of figure elements */
+figure>figcaption.quarto-float-caption-bottom {
+  text-align: center;
+}

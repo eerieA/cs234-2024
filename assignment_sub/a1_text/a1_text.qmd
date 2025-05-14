@@ -109,3 +109,107 @@ c. Yes. As an extreme example, for a discounted MDP with infinite horizon we can
 d. No. The finite horizon MDPs' optimal policies are horizon dependent, but the infinite horizon MDPs' are not, so there are cases where no $\gamma$ can make an infinite horizon MDP produce the same optimal policies as a finite one. Using the setting in this problem, the optimal policy under $H=9$ can be either all sell or first sell then buy, but with infinite horizon the optimal policy is fixed with a fixed $\gamma$. More generally speaking, there is not a one-to-one mapping from a finite horizon $H$ to some discount factor $\gamma$.
 
 </div>
+
+## Reward Hacking [5 pts]
+Q1 illustrates how the particular  horizon and discount factor may lead to 
+to very different policies, even with the same reward and dynamics model. This maylead to unintentional reward hacking, where the resulting policy does not match a human stakeholder's intended outcome. This problem asks you to think about an example where reward hacking may occur, introduced by Pan, Bhatia and Steinhardt\footnote{ICLR 2022 \url{https://openreview.net/pdf?id=JYtwGwIL7ye}}. Consider designing RL for autonomous cars where the goal is to have decision policies that minimize the mean commute for all drivers (those driven by humans andthose driven by AI). This reward might be tricky to specify (it depends on the destination of each car, etc) but a simpler reward (called the reward "proxy") is to maximize the mean velocity of all cars. Now consider a scenario where there is a single AI car (the red car in the figure) and many cars driven by humans (the grey car). 
+
+In this setting, under this simpler "proxy" reward, the optimal policy for the red(AI) car is to park and not merge onto the highway.[^1]
+
+[^1]: Interestingly, it turns out that systems that use simpler function representations may reward hackless in this example than more complex representations. See Pan, Bhatia and Steinhardt's paper "The Effects of Reward Misspecification: Mapping and Mitigating Misaligned Models" for details.
+
+![Pan, Bhatia, Steinhardt ICLR 2022; [source](https://openreview.net/pdf?id=JYtwGwIL7ye)](commute_time.png){#fig-commute width=300px}
+
+**Questions:**
+
+a. Explain why the optimal policy for the AI car is not to merge onto the highway. [2 pts]
+
+b. Note this behavior is not aligned with the true reward function. Share some ideas about alternate reward functions (that are not minimizing commute) that might still be easier to optimize, but would not result in the AI car never merging. Your answer should be 2-5 sentences and can include equations: there is not a single answer and reasonable solutions will be given full credit. [3 pts]
+
+
+<div class="answer">
+Answers:
+
+a. Because if the agent just let the red car park and never merge, its velocity stays at 0, and the human drivers maintain higher average speed; while if the agent lets it merge, the average velocity of all cars would be lowered. Following this, the agent finds that not merging the red car is optimal under this flawed proxy reward.
+
+b. Naively I thought about maximizing the minimum velocity of all cars. That does counter the hacking mentioned in subquestion a, but after a while it occured to me that this probably will lead to overly aggressive policies.
+<br>
+So a better proxy reward may be to make the metric time-dependent, like maximizing time-weighted average velocity of all cars, which is, in non-rigorous but plain words, to only count velocity of cars that has been moving for a while at a time point. In math-y expression:
+$$r_t = \frac{\sum_{i=1}^N p(i) \cdot v_i(t)}{\sum_{i=1}^N p(i)},
+$$
+<br>
+where $i$ is the index of a car, $N$ is total number of cars, and $p$ is the predicate that:
+$$p(i) = \begin{cases}
+			0, & \text{if car $i$ is not moving}\\
+            1, & \text{if car $i$ is moving}
+         \end{cases}.
+$$
+
+</div>
+
+## Bellman Residuals and performance bounds [30 pts]
+
+In this problem, we will study value functions and properties of the Bellman backup operator.
+
+**Definitions:** Recall that a value function is a $|S|$-dimensional vector where $|S|$ is the number of states of the MDP. When we use the term $V$ in these expressions as an ``arbitrary value function'', we mean that $V$ is an arbitrary $|S|$-dimensional vector which need not be aligned with the definition of the MDP at all.
+
+On the other hand, $V^\pi$ is a value function that is achieved by some policy $\pi$ in the MDP.
+
+For example, say the MDP has 2 states and only negative immediate rewards. $V = [1,1]$ would be a valid choice for $V$ even though this value function can never be achieved by any policy $\pi$, but we can never have a $V^\pi = [1,1]$. This distinction between $V$ and $V^\pi$ is important for this question and more broadly in reinforcement learning.
+
+**Properties of Bellman Operators:** In the first part of this problem, we will explore some general and useful properties of the Bellman backup operator, which was introduced during lecture. We know that the Bellman backup operator $B$, defined below is a contraction with the fixed point as $V^*$, the optimal value function of the MDP. The symbols have their usual meanings. $\gamma$ is the discount factor and $0 \leq \gamma < 1$. In all parts, $\|v\| = \max_{s} | v(s) |$ is the infinity norm of the vector.
+$$(BV)(s) = \max_a \left( r(s, a) + \gamma\sum_{s' \in S}p(s'|s,a)V(s') \right).
+$$
+
+We also saw the contraction operator $B^\pi$ with the fixed point $V^\pi$, which is the Bellman backup operator for a particular policy given below:
+$$(B^\pi V)(s) = r(s,\pi(s)) + \gamma\sum_{s' \in S}p(s'|s,\pi(s))V(s').
+$$
+
+In this case, we'll assume $\pi$ is deterministic, but it doesn't have to be in general. In class, we showed that $|| BV - BV' || \leq \gamma ||V - V'||$ for two arbitrary value functions $V$ and $V'$. 
+
+**Questions a-c:**
+
+a. Show that the analogous inequality, $|| B^\pi V - B^\pi V' || \leq \gamma ||V - V'||$, also holds. [3 pts].
+
+b. Prove that the fixed point for $B^\pi$ is unique. Recall that the fixed point is defined as $V$ satisfying $V = B^\pi V$. You may assume that a fixed point exists. \textit{Hint:} Consider proof by contradiction. [3 pts].
+
+c. Suppose that $V$ and $V'$ are vectors satisfying $V(s) \leq V'(s)$ for all $s$. Show that $B^\pi V(s) \leq B^\pi V'(s)$ for all $s$. Note that all of these inequalities are element-wise. [3 pts].
+
+<div class="answer">
+Answers:
+
+a. By the definition of Bellman Operator with any value function for a particular policy, we can write the LHS $||B^{\pi}V - B^{\pi}V'||$ as
+$$
+\begin{array}{rl}
+||B^{\pi}V - B^{\pi}V'|| = & ||r(s, \pi(s)) + \gamma \sum_{s'\in S} p(s'|s, \pi(s)) V(s') \\
+        & - \left(r(s, \pi(s)) + \gamma \sum_{s'\in S} p(s'|s, \pi(s)) V'(s') \right) || \\
+      = & ||\gamma \sum_{s'\in S} p(s'|s, \pi(s)) V(s') - \gamma \sum_{s'\in S} p(s'|s, \pi(s)) V'(s')|| \\
+      = & \gamma ||\sum_{s'\in S} \Bigl[ p(s'|s, \pi(s)) \cdot \left(V(s') - V'(s') \right) \Bigr]|| \quad \text{(for $0 \le \gamma < 1$)} \\
+    \le & \gamma \cdot \sum_{s'\in S} p(s'|s, \pi(s)) \cdot || \sum_{s'\in S} (V(s) - V'(s)) || \quad \text{(triangle inequality)} \\
+      = & \gamma || \sum_{s'\in S} (V(s) - V'(s)) || \quad \text{(sum of probabilities is 1)} \\
+    \le & \gamma || V - V' || \qquad \text{(by the definition of infinity norm)}
+\end{array}
+$$
+As such, the inequality holds true. $\blacksquare$
+
+b. Use proof by contradiction. According to the premise, a fixed point exists. Denote it as $V_1$. Assume there exists another fixed point $V_2$ that is different than $V_1$. By the definition of fixed point, we then have $V_1 = B^{\pi} V_1$ and $V_2 = B^{\pi} V_2$, which leads to $||B^{\pi} V_1 - B^{\pi} V_2|| = ||V_1 - V_2||$. Substitute it into the general inequality derived in subproblem a, we obtain:
+$$
+\begin{array}{rl}
+||B^{\pi} V_1 - B^{\pi} V_2|| = & ||V_1 - V_2|| \le \gamma ||V_1 - V_2|| \\
+\Rightarrow & 1 \le \gamma \quad \text{, by the assumption $V_1 \ne V_2$.}
+\end{array}$$
+However, this contradicts with $0 \le \gamma < 1$. Therefore, the original statement is true.
+
+c. For verifying inequality, consider using subtraction. By the definition of Bellman Operator, compare the difference between $B^{\pi}V(s) - B^{\pi}V'(s)$ for all $s$:
+$$
+\begin{array}{rl}
+B^{\pi}V(s) - B^{\pi}V'(s) = & r(s, \pi(s)) + \gamma \sum_{s'\in S} p(s'|s, \pi(s)) V(s') \\
+        & - \left(r(s, \pi(s)) + \gamma \sum_{s'\in S} p(s'|s, \pi(s)) V'(s') \right) \\
+      = & \gamma \bigl( \sum_{s'\in S} p(s'|s, \pi(s)) V(s') - \sum_{s'\in S} p(s'|s, \pi(s)) V'(s') \bigr) \\
+      = & \gamma \cdot \bigl( \sum_{s'\in S} p(s'|s, \pi(s)) \bigr) \cdot \bigl( V(s') - V'(s') \bigr) \\
+      = & \gamma \cdot \bigl( V(s') - V'(s') \bigr) \\
+    \le & 0 \qquad \text{ ($\gamma \in [0, 1)$ and $V(s') - V'(s') \le 0$ $\forall s'$).}
+\end{array}
+$$
+So we have $B^{\pi}V(s) \le B^{\pi}V'(s)$.
+</div>
