@@ -12,8 +12,8 @@ ol {
   list-style-type: lower-alpha;
 }
 
-.ol-deci {
-  list-style-type: decimal;
+.lower-roman ol {
+  list-style-type: lower-roman;
 }
 
 .note {

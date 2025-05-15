@@ -10,6 +10,11 @@ format:
     number-sections: true
 ---
 
+$$
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+$$
+
 ## Effect of Effective Horizon [8 pts]
 
 Consider an agent managing inventory for a store, which is represented as an MDP. The stock level $s$ refers to the number of items currently in stock (between 0 and 10, inclusive). At any time, the agent has two actions: sell (decrease stock by one, if possible) or buy (increase stock by one, if possible).
@@ -190,7 +195,7 @@ $$
     \le & \gamma || V - V' || \qquad \text{(by the definition of infinity norm)}
 \end{array}
 $$
-As such, the inequality holds true. $\blacksquare$
+As such, the inequality holds true.
 
 b. Use proof by contradiction. According to the premise, a fixed point exists. Denote it as $V_1$. Assume there exists another fixed point $V_2$ that is different than $V_1$. By the definition of fixed point, we then have $V_1 = B^{\pi} V_1$ and $V_2 = B^{\pi} V_2$, which leads to $||B^{\pi} V_1 - B^{\pi} V_2|| = ||V_1 - V_2||$. Substitute it into the general inequality derived in subproblem a, we obtain:
 $$
@@ -198,7 +203,7 @@ $$
 ||B^{\pi} V_1 - B^{\pi} V_2|| = & ||V_1 - V_2|| \le \gamma ||V_1 - V_2|| \\
 \Rightarrow & 1 \le \gamma \quad \text{, by the assumption $V_1 \ne V_2$.}
 \end{array}$$
-However, this contradicts with $0 \le \gamma < 1$. Therefore, the original statement is true.
+However, this contradicts with $0 \le \gamma < 1$. Therefore, the original statement is true. $\blacksquare$
 
 c. For verifying inequality, consider using subtraction. By the definition of Bellman Operator, compare the difference between $B^{\pi}V(s) - B^{\pi}V'(s)$ for all $s$:
 $$
@@ -212,4 +217,136 @@ B^{\pi}V(s) - B^{\pi}V'(s) = & r(s, \pi(s)) + \gamma \sum_{s'\in S} p(s'|s, \pi(
 \end{array}
 $$
 So we have $B^{\pi}V(s) \le B^{\pi}V'(s)$.
+</div>
+
+**Bellman Residuals:** Having gained some intuition for value functions and the Bellman operators, we now turn to understanding how policies can be extracted and what their performance might look like. We can extract a greedy policy $\pi$ from an arbitrary value function $V$ using the equation below. 
+$$\pi(s) = \argmax_{a} [{r(s,a) + \gamma\sum_{s' \in S}p(s'|s,a)V(s')}]
+$$
+
+It is often helpful to know what the performance will be if we extract a greedy policy from an arbitrary value function. To see this, we introduce the notion of a Bellman residual.
+
+Define the Bellman residual to be $(BV - V)$ and the Bellman error magnitude to be $||BV - V||$.
+
+**Questions d-e:**
+
+d. For what value function $V$ does the Bellman error magnitude $\|BV - V \|$ equal 0? Why? [2 pts]
+
+e. Prove the following statements for an arbitrary value function $V$ and any policy $\pi$.  [5 pts]  
+*Hint:* Try leveraging the triangle inequality by inserting a zero term.
+$$||V - V^\pi|| \leq \frac{||V - B^\pi V||}{1-\gamma}$$
+$$||V - V^*|| \leq \frac{||V - BV||}{1-\gamma}.$$
+
+<div class="answer">
+Answers:
+
+d. From previous subproblem b we know that by definition, a fixed point for $B^{\pi}$ satisfies $V=B^{\pi}V$, so for this fixed point value function $V$, the Bellman error magnitude equal 0. Because we have shown that such a $V$ is unique, this is the only $V$ that makes the Bellman error magnitude equal 0.
+
+e. For the first inequality:
+$$||V - V^{\pi}|| = ||V - B^{\pi}V + B^{\pi}V - V^{\pi}|| \le ||V - B^{\pi}V|| + ||B^{\pi}V - V^{\pi}||
+$$
+, and
+$$
+\begin{array}{rl}
+||B^{\pi}V - V^{\pi}|| = & ||B^{\pi}V - B^{\pi}V^{\pi}|| \quad \text{(by definition of fixed point)} \\
+& \le \gamma ||V - V^{\pi}|| \quad \text{(by contraction property)}
+\end{array}
+$$
+, so there is
+$$||V - V^{\pi}|| \le ||V - B^{\pi}V|| + \gamma ||V - V^{\pi}||
+$$
+$$\Rightarrow (1 - \gamma) ||V - V^{\pi}|| \le ||V - B^{\pi}V||
+$$
+$$\Rightarrow ||V - V^{\pi}|| \le \frac{||V - B^{\pi}V||}{(1 - \gamma)}.
+$$
+Similarly, for the second inequality:
+$$||V - V^{*}|| = ||V - BV + BV - V^{*}|| \le ||V - BV|| + ||BV - V^{*}||
+$$
+, and
+$$
+\begin{array}{rl}
+||BV - V^{*}|| = & ||BV - BV^{*}|| \quad \text{(by optimality of $V^*$)} \\
+& \le \gamma ||V - V^{\pi}|| \quad \text{(by contraction property)}
+\end{array}
+$$
+, so there is
+$$||V - V^{*}|| \le ||V - BV|| + \gamma ||V - V^{*}||
+$$
+$$\Rightarrow (1 - \gamma) ||V - V^{*}|| \le ||V - BV||
+$$
+$$\Rightarrow ||V - V^{*}|| \le \frac{||V - BV||}{(1 - \gamma)}. \quad \blacksquare
+$$
+</div>
+
+The result you proved in part (e) will be useful in proving a bound on the policy performance in the next few parts. Given the Bellman residual, we will now try to derive a bound on the policy performance, $V^\pi$.
+
+f. Let $V$ be an arbitrary value function and $\pi$ be the greedy policy extracted from $V$. Let $\epsilon = ||BV-V||$ be the Bellman error magnitude for $V$. Prove the following for any state $s$. [5 pts]\\
+*Hint:* Try to use the results from part (e).
+$$V^\pi(s) \geq V^*(s) - \frac{2\epsilon}{1-\gamma}
+$$
+
+g. Give an example real-world application or domain where having a lower bound on $V^\pi(s)$ would be useful. [2 pt]
+
+h. Suppose we have another value function $V'$ and extract its greedy policy $\pi'$.  $\|B V' - V' \| = \epsilon = \|B V - V\|$. Does the above lower bound imply that $V^\pi(s) = V^{\pi'}(s)$ at any $s$? [2 pts]
+
+<div class="answer">
+Answers:
+
+f. Following the hint, try to connect $V^{\pi}(s)$ and $V^*(s)$ with an arbitrary $V(s)$ and write $||V^{\pi}(s) - V^*(s)|| = ||V^{\pi}(s) - V(s) + V(s) - V^*(s)||$. Then we have
+$$||V^{\pi}(s) - V^*(s)|| \le ||V^{\pi}(s) - V(s)|| + ||V(s) - V^*(s)|| \quad \text{(triangle inequality)}.
+$$
+Integrating the inequalities we proved in e, the RHS would be
+$$||V^{\pi}(s) - V(s)|| + ||V(s) - V^*(s)|| \le \frac{||V(s) - B^{\pi}V(s)||}{1-\gamma} + \frac{||V(s) - BV(s)||}{1-\gamma}.
+$$
+Notice that since $B$ is the general Bellman operator, and $B^{\pi}$ is Bellman operator of some particular (greedy) policy, the error magnitude with $B^{\pi}$ should be covered by $\epsilon$. That is, $||V(s) - B^{\pi}V(s)|| \le \epsilon$. Therefore
+$$\frac{||V(s) - B^{\pi}V(s)||}{1-\gamma} + \frac{||V(s) - BV(s)||}{1-\gamma} \le \frac{2 \epsilon}{1-\gamma}.
+$$
+Combining the above we have
+$$||V^{\pi}(s) - V^*(s)|| \le \frac{2 \epsilon}{1-\gamma}.
+$$
+Since $V^*(s)$ is the optimal policy's value function, there must be $V^{\pi} < V^*$. Use this fact on the previous inequality to obtain:
+$$V^*(s) - V^{\pi}(s) \le \frac{2 \epsilon}{1-\gamma}
+$$
+$$\Rightarrow  V^{\pi}(s) \ge V^*(s) - \frac{2 \epsilon}{1-\gamma}. \quad \blacksquare
+$$
+
+g. Inspired by the self-driving car example in Q1, I think a real-world application can be autonomous driving. When there is guarateed to be a lower bound on an greedy policy, it means we can instruct the agent to find a greedy policy, and the policy's performance would not fall below a certain predicatable threshold, which is a useful reassurance or indicator for significant error.  
+There must be many other examples in health care, manufacture, security, etc.
+
+h. Probably not. Generally a lower bound on infinity norm cannot directly lead to tight restrictions on the vectors themselves. More specifically, a lower bound on $||BV - V||$ bounds the largest element-wise distance between $V$ and $BV$, but does not limit the shape of $V$. There can be a $V'$ that incurs the same Bellman residue but is different in shape, which means the extracted greedy policies $\pi$ and $\pi'$ are going to be different.
+</div>
+
+**A little bit more notation:** define $V \leq V'$ if $\forall s$, $V(s) \leq V'(s)$.
+
+What if our algorithm returns a $V$ that satisfies $V^* \leq V$? I.e., it returns a value function that is better than the optimal value function of the MDP. Once again, remember that $V$ can be any vector, not necessarily achievable in the MDP but we would still like to bound the performance of $V^\pi$ where $\pi$ is extracted from said $V$. We will show that if this condition is met, then we can achieve an even tighter bound on policy performance.
+
+**Question i:**
+
+::: {.lower-roman}
+1. Using the same notation and setup as part (e), if $V^* \le V$, show the following holds for any state $s$.  
+*Hint*: Recall that $\forall \pi,\;V^\pi\le V^*$.
+$$
+V^\pi(s) \ge V^*(s) - \frac{\epsilon}{1-\gamma},
+\quad \epsilon = \|B\,V - V\|.
+$$
+:::
+
+Intuition: A useful way to interpret the results from parts (h) (and (i)) is based on the observation that a constant immediate reward of $r$ at every time-step leads to an overall discounted reward of $r + \gamma r + \gamma^2 r + \ldots = \frac{r}{1-\gamma}$. Thus, the above results say that a state value function $V$ with Bellman error magnitude $\epsilon$ yields a greedy policy whose reward per step (on average), differs from optimal by at most $2\epsilon$. So, if we develop an algorithm that reduces the Bellman residual, we're also able to bound the performance of the policy extracted from the value function outputted by that algorithm, which is very useful!
+
+<div class="answer">
+Answer:
+
+::: {.lower-roman}
+1. The second inequality from e gives
+$$||V - V^{\pi}|| \le \frac{||V-BV||}{1-\gamma},
+$$
+and from this combined with the given $V^{\pi} \le V^* \le V$, it can be derive that
+$$V^{\pi} \ge V - \frac{||V-BV||}{1-\gamma}.
+$$
+Apply the given $V^* \le V \Rightarrow V \ge V^*$ again on the RHS, we have
+$$V^{\pi} \ge V - \frac{||V-BV||}{1-\gamma} \ge V^* - \frac{||V-BV||}{1-\gamma}.
+$$
+Therefore
+$$V^{\pi}(s) \ge V^*(s) - \frac{\epsilon}{1-\gamma} \; ,\forall s.
+$$
+:::
 </div>

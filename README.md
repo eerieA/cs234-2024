@@ -2,9 +2,9 @@
 
 <img alt="Course cover image" src="./Fig/RL.png" width="300">
 
-This repo contains Stanford CS234 **2024 spring** assignment's coding problems (as claimed by the original repo owner), and some personally taken notes after watching the [free video lectures on Youtube](https://www.youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX). The official course website is [here](https://web.stanford.edu/class/cs234/), which contains entire course materials for the **latest** offering, for example, winter 2025. So please be advised that the assignments here might not match the latest course material exactly.
+This repo contains Stanford CS234 **2024 spring** assignment's coding problems (as claimed by the original repo owner), and some personal notes after watching the free video lectures on Youtube (also for 2024 spring).
 
-Feel free to follow the instructions in each problem directory to run and test it.
+If further interested, [this link](https://web.stanford.edu/class/cs234/modules.html) contains entire public-access course materials for the **latest** offering, for example, winter 2025. But please be advised that the assignments in this repo probably do not match the latest course content exactly.
 
 ### Attribution
 
@@ -14,7 +14,17 @@ Based on https://github.com/Rhyme0730/CS234-Reinforcement-Learning . Commits on 
 
 The *assignment_sub* folder in this repo contains personal attempts at solving the assignment problems (written as [Quarto](https://quarto.org/) docs), not guarateed to be correct at all.
 
-## Assignments
+## Official material links
+
+Also for spring 2024 offering.
+
+⚠️ These may expire without notice.
+
+[Lecture videos](https://www.youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX) |
+[Lecture materials](https://web.stanford.edu/class/cs234/CS234Spr2024/modules.html) |
+[Assignment files](https://web.stanford.edu/class/cs234/CS234Spr2024/assignments).
+
+## Assignment previews
 
 ## A1_P4: RiverSwim MDP
 
