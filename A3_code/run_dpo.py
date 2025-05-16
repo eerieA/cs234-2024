@@ -64,13 +64,7 @@ class ActionSequenceModel(nn.Module):
         self.segment_len = segment_len
         #######################################################
         #########   YOUR CODE HERE - 3-9 lines.    ############
-        output_dim = 2*action_dim*segment_len  ##  2 ranked sequences of a^1 and a^2
-        self.net = nn.Sequential(
-            nn.Linear(obs_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Linear(hidden_dim, output_dim)
-        )
-        self.optimizer = torch.optim.AdamW(self.net.parameters(), lr=lr)
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -111,15 +105,7 @@ class ActionSequenceModel(nn.Module):
 
         #######################################################
         #########   YOUR CODE HERE - 3-9 lines.    ############
-        # print(f'batch_size = {batch_size}, seglen*action_dim = {self.segment_len*self.action_dim}')
-        first_half, second_half = torch.split(net_out, self.segment_len*self.action_dim, dim=-1)
-        first_half = torch.reshape(first_half, (batch_size, self.segment_len, self.action_dim))
-        second_half = torch.reshape(second_half, (batch_size, self.segment_len, self.action_dim))
 
-        mean = torch.tanh(first_half)
-        log_std = torch.clamp(second_half, LOGSTD_MIN, LOGSTD_MAX)
-        std = torch.exp(log_std)
-        
         #######################################################
         #########          END YOUR CODE.          ############
         return mean, std
@@ -148,10 +134,7 @@ class ActionSequenceModel(nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 1-5 lines.    ############
-        mean, std = self.forward(obs)
-        normal = D.Normal(mean, std)
-        dist = D.Independent(normal, 2)
-        return dist
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -175,14 +158,6 @@ class ActionSequenceModel(nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 2-6 lines.    ############
-        obs_torch = np2torch(obs)
-        # print(obs_torch.shape)
-        dist = self.distribution(obs_torch.unsqueeze(0))
-        # print(obs_torch.unsqueeze(0).shape)
-        sample_act = dist.sample()
-        sample_act = torch.clamp(sample_act, -1, 1)
-        first_act = sample_act[0][0].detach().numpy()
-        return first_act
 
         #######################################################
         #########          END YOUR CODE.          ############
@@ -208,12 +183,7 @@ class SFT(ActionSequenceModel):
         """
         #######################################################
         #########   YOUR CODE HERE - 4-6 lines.    ############
-        act_dist = self.distribution(obs)
-        log_prob = act_dist.log_prob(actions)
-        loss = -torch.mean(log_prob)
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
+
         #######################################################
         #########          END YOUR CODE.          ############
         return loss.item()
@@ -262,22 +232,7 @@ class DPO(ActionSequenceModel):
         """
         #######################################################
         #########   YOUR CODE HERE - 8-14 lines.   ############
-        with torch.no_grad():
-            ref_act_dist = ref_policy.distribution(obs)
-            ref_log_pi_w = ref_act_dist.log_prob(actions_w)
-            ref_log_pi_l = ref_act_dist.log_prob(actions_l)
 
-        act_dist = self.distribution(obs)
-        log_pi_w = act_dist.log_prob(actions_w)
-        log_pi_l = act_dist.log_prob(actions_l)
-        
-        m = self.beta*(log_pi_w-ref_log_pi_w) - self.beta*(log_pi_l-ref_log_pi_l)
-        log_loss = F.logsigmoid(m)
-        
-        loss = -torch.mean(log_loss)
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()      
         #######################################################
         #########          END YOUR CODE.          ############
         return loss.item()

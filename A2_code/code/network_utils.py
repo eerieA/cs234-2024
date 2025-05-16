@@ -25,22 +25,13 @@ def build_mlp(input_size, output_size, n_layers, size):
     """
     #######################################################
     #########   YOUR CODE HERE - 7-15 lines.   ############
-    layers = []
-    layers.append(nn.Linear(input_size, size))
-    layers.append(nn.ReLU())
-    for _ in range(n_layers-1):
-        layers.append(nn.Linear(size, size))
-        layers.append(nn.ReLU())
-    layers.append(nn.Linear(size, output_size))
-    model = nn.Sequential(*layers)
 
-    return model
     #######################################################
     #########          END YOUR CODE.          ############
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# print(device)
+
 
 def np2torch(x, cast_double_to_float=True):
     """
@@ -53,7 +44,3 @@ def np2torch(x, cast_double_to_float=True):
     if cast_double_to_float and x.dtype is torch.float64:
         x = x.float()
     return x
-
-# Test
-# mlp = build_mlp(20, 20, 3, 30)
-# print(mlp)

@@ -2,3 +2,7 @@
 assignment_sub/*/*.html
 assignment_sub/*/*_files/
 assignment_sub/*/.jupyter_cache/
+
+# Python related
+*venv/
+*__pycache__

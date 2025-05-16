@@ -47,14 +47,7 @@ class RewardModel(nn.Module):
         super().__init__()
         #######################################################
         #########   YOUR CODE HERE - 2-10 lines.   ############
-        input_dim = obs_dim + action_dim
-        self.net =  nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.LeakyReLU(),
-            nn.Linear(hidden_dim, 1),
-            nn.Softmax()
-        )
-        self.optimizer = torch.optim.AdamW(self.net.parameters())
+
         #######################################################
         #########          END YOUR CODE.          ############
         self.r_min = r_min
@@ -93,11 +86,7 @@ class RewardModel(nn.Module):
         rewards = torch.zeros(obs.shape[0])
         #######################################################
         #########   YOUR CODE HERE - 2-3 lines.   ############
-        input_tensor = torch.cat((obs, action), 1)
-        ratio = self.net(input_tensor)
-        # rewards = (1-ratio)*self.r_min + ratio*self.r_max
-        r1 = torch.mul(ratio, (self.r_max-self.r_min))
-        rewards = torch.add(r1, self.r_min)
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -129,11 +118,7 @@ class RewardModel(nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 1-4 lines.   ############
-        obs = np2torch(obs)
-        action = np2torch(action)
-        obs, action = torch.unsqueeze(obs, 0), torch.unsqueeze(action, 0)
-        rewards = self.forward(obs, action)
-        return rewards.item()
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -158,15 +143,6 @@ class RewardModel(nn.Module):
         loss = torch.zeros(1)
         #######################################################
         #########   YOUR CODE HERE - 5-10 lines.   ############
-        r1 = self.forward(obs1, act1)
-        r2 = self.forward(obs2, act2)
-        inverse_label = 1 - label
-        target = torch.cat((inverse_label.unsqueeze(1), label.unsqueeze(1)), axis=1)
-
-        exp_r1 = torch.sum(r1, axis=1)
-        exp_r2 = torch.sum(r2, axis=1)
-        logits = torch.stack((exp_r1, exp_r2), axis=1)
-        loss = F.cross_entropy(logits, target)
 
         #######################################################
         #########          END YOUR CODE.          ############

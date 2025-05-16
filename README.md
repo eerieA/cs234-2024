@@ -2,13 +2,13 @@
 
 <img alt="Course cover image" src="./Fig/RL.png" width="300">
 
-This repo contains Stanford CS234 **2024 spring** assignment's coding problems (as claimed by the original repo owner), and some personal notes after watching the free video lectures on Youtube (also for 2024 spring).
+This repo contains Stanford CS234 **2024 spring** assignment's coding problems (*unfilled* templates), and some personal notes after watching the free video lectures on Youtube (also for 2024 spring).
 
-If further interested, [this link](https://web.stanford.edu/class/cs234/modules.html) contains entire public-access course materials for the **latest** offering, for example, winter 2025. But please be advised that the assignments in this repo probably do not match the latest course content exactly.
+If further interested, [this link](https://web.stanford.edu/class/cs234/modules.html) contains entire public-access course materials for the **latest** offering, for example, winter 2025. Due to being different offerings, please be advised that the assignments in this repo may not match the latest course content exactly.
 
 ### Attribution
 
-Based on https://github.com/Rhyme0730/CS234-Reinforcement-Learning . Commits on and before Feb 4, 2025 were all made by the owner of that repo. Please consider forking that repo if you don't need to make your own independent commits.
+Based on https://github.com/Rhyme0730/CS234-Reinforcement-Learning . Commits on and before Feb 4, 2025 were all made by the owner of that repo. Also there are *finished* assignment code in that repo. Please consider forking that repo if you don't need to make your own independent commits.
 
 ### Disclaimer
 
@@ -25,6 +25,8 @@ Also for spring 2024 offering.
 [Assignment files](https://web.stanford.edu/class/cs234/CS234Spr2024/assignments).
 
 ## Assignment previews
+
+These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at a top institution so these are probably very good references.
 
 ## A1_P4: RiverSwim MDP
 

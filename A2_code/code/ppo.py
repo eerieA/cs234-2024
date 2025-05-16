@@ -47,16 +47,7 @@ class PPO(PolicyGradient):
 
         #######################################################
         #########   YOUR CODE HERE - 10-15 lines.   ###########
-        self.optimizer.zero_grad()
-        dist = self.policy.action_distribution(observations)
-        log_probs = dist.log_prob(actions)
-        ratio = torch.exp(log_probs-old_logprobs)
-        time_steps = observations.shape[0]
-        
-        clipped_ratio = torch.clip(input=ratio, min=1-self.eps_clip, max=1+self.eps_clip)
-        loss = -torch.sum(torch.minimum(ratio*advantages, clipped_ratio*advantages))/time_steps
-        loss.backward()
-        self.optimizer.step()
+
         #######################################################
         #########          END YOUR CODE.          ############
 

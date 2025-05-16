@@ -18,39 +18,3 @@
 ```bash
 bash collect_submission.sh
 ```
-
-
-
-# How to Run This Code
-
-```shell
-python main.py --env-name ENV --seed SEED --METHOD
-```
-
-ENV: cartpole/pendulum/cheetah
-
-SEED: 1/2/3
-
-METHOD: baseline/no-baseline/ppo
-
-(note: no-baseline is REINFORCE)
-
-e.g. For cartpole
-
-```shell
-python main.py --env-name cartpole --seed 1 --ppo
-```
-
-
-
-For problem (d) 's plot,
-
-```shell
-python plot.py --env-name ENV --seeds SEEDS
-```
-
-Running this scripts requires you have run all method for specified ENV and SEEDS
-
-e.g.
-
-![](code/results/results-cartpole.png)
