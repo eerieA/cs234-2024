@@ -103,7 +103,7 @@ def policy_improvement(policy, R, T, V_policy, gamma):
         for a in range(num_actions):
             # Reminder: V_policy is old policy's value function
             a_q_vals[a] = bellman_backup(s, a, R, T, gamma, V_policy)
-        
+
         new_pi_s = np.argmax(a_q_vals)
         new_policy[s] = new_pi_s
 
@@ -131,7 +131,28 @@ def policy_iteration(R, T, gamma, tol=1e-3):
     policy = np.zeros(num_states, dtype=int)
     ############################
     # YOUR IMPLEMENTATION HERE #
+    """ i = 0
+    new policy = an array of randomly chosen actions
+    while i==0 or ||new_policy - policy||_1 > tol
+        curr policy value func = policy_evaluation(policy)
+        new policy = policy_improvement(policy, R, T, curr policy value func, gamma)
+        i += 1 """
+    i = 0
+    new_policy = np.random.choice(num_actions, size=num_states)
+    # For recording the distance between pi_{i+1} and pi_i
+    dist = float("inf")
+    while i == 0 or dist > tol:
+        if i > 10000:
+            print("policy_iteration: Max iteration reached. Is there something wrong?")
+            break
 
+        V_policy = policy_evaluation(policy, R, T, gamma)
+        new_policy = policy_improvement(policy, R, T, V_policy, gamma)
+
+        # Record distance before updating policy
+        dist = np.linalg.norm(new_policy - policy, ord=1)
+        policy = new_policy
+        i += 1
     ############################
     return V_policy, policy
 
@@ -153,9 +174,69 @@ def value_iteration(R, T, gamma, tol=1e-3):
     policy = np.zeros(num_states, dtype=int)
     ############################
     # YOUR IMPLEMENTATION HERE #
+    """ 
+    k = 1
+    value func = all zeros (already given)
+    while ||value func k+1 = value func k||_inf <= tol
+        for each s
+            new value func [s] = max of bellman backup val for every a, at this s
+        distance = ||new value func - value func||_inf
+        k += 1
+    after value func converges, extract policy
+    for each s
+        new policy [s] = action with max bellman backup val, at this s """
+    k = 0
+    # For tracking the inf norm distance
+    err = float("inf")
+    while err > tol:
+        if k > 10000:
+            print("value_iteration: Max iteration reached. Is there something wrong?")
+            break
 
+        err = 0.0
+        new_value_func = np.copy(value_function)
+        for s in range(num_states):
+            a_q_vals = [
+                bellman_backup(s, a, R, T, gamma, value_function)
+                for a in range(num_actions)
+            ]
+            max_q = max(a_q_vals)
+
+            err = max(err, abs(max_q - value_function[s]))
+            new_value_func[s] = max_q
+            k += 1
+        value_function = new_value_func
+
+    # Extract policy
+    for s in range(num_states):
+        a_q_vals = [
+            bellman_backup(s, a, R, T, gamma, value_function)
+            for a in range(num_actions)
+        ]
+        policy[s] = np.argmax(a_q_vals)
     ############################
     return value_function, policy
+
+
+def find_max_gamma_goes_left(strength_name, tol=0.001):
+    low, high = 0.0, 1.0
+    gamma_result = 0.0
+
+    while high - low > tol:
+        mid = (low + high) / 2
+        env = RiverSwim(strength_name)
+        R, T = env.get_model()
+        V, pi = value_iteration(R, T, gamma=mid)
+
+        if pi[0] == 0:  # LEFT
+            # Could work but try to increase gamma and see if that still works
+            gamma_result = mid
+            low = mid
+        else:  # RIGHT
+            # Would not work, reduce gamma
+            high = mid
+
+    return round(gamma_result, 3)
 
 
 def test_bellman_backup():
@@ -212,6 +293,8 @@ def test_bellman_backup():
 # Edit below to run policy and value iteration on different configurations
 # You may change the parameters in the functions below
 if __name__ == "__main__":
+    test_bellman_backup()
+
     SEED = 1234
 
     RIVER_CURRENT = "WEAK"
@@ -233,4 +316,7 @@ if __name__ == "__main__":
     print(V_vi)
     print([["L", "R"][a] for a in policy_vi])
 
-    test_bellman_backup()
+    print("\nBinary search for the required gamma...")
+    print("Weak current:", find_max_gamma_goes_left("WEAK"))
+    print("Medium current:", find_max_gamma_goes_left("MEDIUM"))
+    print("Strong current:", find_max_gamma_goes_left("STRONG"))

@@ -8,6 +8,7 @@ format:
   html: 
     css: styles.css
     number-sections: true
+    embed-resources: true
 ---
 
 $$
@@ -350,3 +351,43 @@ $$V^{\pi}(s) \ge V^*(s) - \frac{\epsilon}{1-\gamma} \; ,\forall s.
 $$
 :::
 </div>
+
+## RiverSwim MDP [25 pts]
+
+Now you will implement value iteration and policy iteration for the RiverSwim environment (see picture below^[Figure copied from [Osband & Van Roy, 2013](https://proceedings.neurips.cc/paper/2013/hash/6a5889bb0190d0211a991f47bb19a777-Abstract.html).]) of [Strehl & Littman, 2008](https://www.sciencedirect.com/science/article/pii/S0022000008000767).
+
+![The RiverSwim MDP where dashed and solid arrows represent transitions for the LEFT and RIGHT actions, respectively. The assignment uses a modified, customizable version of what is shown above where there are three different strengths (WEAK, MEDIUM, or STRONG) of the current (transition probabilities for being pushed back or successfully swimming RIGHT).](RiverSwim.png){#fig-riverswim width=100%}
+
+Setup: This assignment needs to be completed with Python3 and $\texttt{numpy}$. 
+
+Submission: There is a $\texttt{Makefile}$ provided that will help you submit the assignment. Please run $\texttt{make clean}$ followed by $\texttt{make submit}$ in the terminal and submit the resulting zip file on Gradescope.
+
+a. **(coding)** Read through $\texttt{vi\_and\_pi.py}$ and implement $\texttt{bellman\_backup}$. Return the value associated with a single Bellman backup performed for an input state-action pair. [4 pts]
+
+b. **(coding)** Implement $\texttt{policy\_evaluation}$, $\texttt{policy\_improvement}$ and $\texttt{policy\_iteration}$ in  $\texttt{vi\_and\_pi.py}$. Return the optimal value function and the optimal policy. [8pts]
+
+c. **(coding)** Implement $\texttt{value\_iteration}$ in $\texttt{vi\_and\_pi.py}$. Return the optimal value function and the optimal policy. [8 pts]
+
+a. **(written)** Run both methods on RiverSwim with a [weak]{.smallcaps} current strength and find the largest discount factor (**only** up to two decimal places) such that an optimal agent starting in the initial far-left state (state $s_1$ in Figure @fig-riverswim) **does not** swim up the river (that is, does not go [RIGHT]{.smallcaps}). Using the value you find, interpret why this behavior makes sense. Now repeat this for RiverSwim with [medium]{.smallcaps}  and [strong]{.smallcaps} currents, respectively. Describe and explain the changes in optimal values and discount factors you obtain both quantitatively and qualitatively. [5 pts]
+<br><br>
+*Sanity Check:* For RiverSwim with a discount factor $\gamma = 0.99$ and a [weak]{.smallcaps} current, the values for the left-most and right-most states ($s_1$ and $s_6$ in Figure @fig-riverswim above) are $\texttt{30.328}$ and $\texttt{36.859}$ when computed with a tolerance of $0.001$. The value functions from VI and PI should be within error tolerance $0.001$ of these values. You can use this to verify your implementation. For grading purposes, we shall test your implementation against other hidden test cases as well.
+
+::: {.answer}
+Answers:
+
+a. Implemented.
+
+b. Implemented.
+
+c. Implemented.
+
+d. Running the script gives the threshold discound as follows:
+  - Weak current: 0.67
+  - Medium current: 0.77
+  - Strong current: 0.93.
+<br><br>
+This makes sense because different discount factors affect the agent's decisions based on how it sees future rewards:
+  - For small $\gamma$, agent cares more about immediate reward, so it would prefer LEFT.
+  - As $\gamma$ increases, future reward (at far right) becomes more valuable, so the agent prefers RIGHT.
+  - Stronger currents means harder to reach the far-right, so we need even higher $\gamma$ to justify the risk.
+:::

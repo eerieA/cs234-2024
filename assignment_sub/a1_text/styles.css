@@ -27,3 +27,7 @@ ol {
 figure>figcaption.quarto-float-caption-bottom {
   text-align: center;
 }
+
+.smallcaps {
+  font-variant: small-caps;
+}
