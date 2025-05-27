@@ -1,0 +1,92 @@
+---
+title: "A2"
+bibliography: references.bib
+execute:
+  enabled: true
+  cache: true
+format:
+  html: 
+    css: styles.css
+    number-sections: true
+    embed-resources: true
+---
+
+$$
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+$$
+
+## Deep $Q$-Networks (DQN) (8 pts writeup)
+
+All questions in the section pertain to DQN. The pseudocode for DQN is provided below.
+
+**Algorithm 1** Deep $Q$-Network (DQN)
+---
+
+- Initialize replay buffer $\mathcal{D}$  
+- Initialize action-value function $Q$ with random weights $\theta$  
+- Initialize target action-value function $\hat{Q}$ with weights $\theta^- = \theta$  
+
+- **For** episode = 1 to $M$:  
+   - Receive initial state $s_1$  
+   - **For** $t = 1$ to $T$:  
+     - With probability $\epsilon$, select a random action $a_t$  
+     - Otherwise, select  
+       $$
+       a_t = \arg\max_a Q(s_t, a; \theta)
+       $$
+     - Execute action $a_t$ and observe reward $r_t$ and next state $s_{t+1}$  
+     - Store transition $(s_t, a_t, r_t, s_{t+1})$ in $\mathcal{D}$  
+     - Sample random minibatch $B$ of transitions from $\mathcal{D}$  
+     - **For each** transition $(s_j, a_j, r_j, s_{j+1})$ in $B$:  
+       - **If** $s_{j+1}$ is terminal:  
+         - Set $y_j = r_j$  
+       - **Else**:  
+         - Set  
+           $$
+           y_j = r_j + \gamma \max_{a'} \hat{Q}(s_{j+1}, a'; \theta^-)
+           $$
+       - Perform gradient descent step on  
+         $$
+         (y_j - Q(s_j, a_j; \theta))^2
+         $$
+         with respect to network parameters $\theta$  
+     - Every $C$ steps, reset target network by setting  
+       $$
+       \theta^- = \theta
+       $$
+---
+
+In this pseudocode:
+
+- $\mathcal{D}$ is the replay memory which stores transitions.
+- $\theta$ are the weights of the Q-network, which are adjusted during training.
+- $\theta^-$ are the weights of the target network, which are periodically updated to match $\theta$.
+- $M$ is the number of episodes over which the training occurs.
+- $T$ is the maximum number of steps in each episode.
+- $\epsilon$ is the exploration rate, which is typically decayed over time.
+- $\gamma$ is the discount factor, used to weigh future rewards.
+- $C$ is the frequency with which to update the target network's weights.
+
+### Written Questions
+
+1. **(a) (3 pts)**  
+   **(written)** What are three key differences between the DQN and $Q$-learning algorithms?
+
+2. **(b) (2 pts)**  
+   **(written)** When using DQN with a deep neural network, which of the above components would you hypothesize contributes most to performance gains? Justify your answer.
+
+3. **(c) (3 pts)**  
+   **(written)** In DQN, the choice of target network update frequency is important. What might happen if the target network is updated every $10^{15}$ steps for an agent learning to play a simple Atari game like *Pong*?
+
+::: {.answer}
+1.
+  - Value functions are different. Q-learning uses a tabular data structure to store the Q function's values. DQN uses function approximator such as linear function or neural network.
+  - Sources of existing data are different. Q-learning updates the Q-values immediately using the most recent transition. DQN keeps a window of historical data called a replay buffer, and samples random minibatches for the target value in updating the Q function.
+  - Q-targets are different. Q-learning uses the same parameters (for the Q function) in both the target and new value, which changes every time, while DQN uses a fixed set of parameters in the target, which is fixed for a certain amount of steps.
+
+2. I imagine the history replay buffer would contribute the most to performance gains. Because deep neural networks are sensitive to correlated data in training, so sampling from a reasonably far away history w.r.t to the current time is good for restoring some i.i.d. property, thus decreasing the chance of instability. We also saw a comparison graph in class from a paper, showing the performance contribution of replays in DQN in Atari games [@mnih2015].
+
+3. $10^{15}$ steps usually takes very long to reach for a RL agent in training, with today's harware. For example if it learns $5000$ steps per second on Pong, then it would take $\sim 6341.958$ years for it to learn $10^{15}$ steps. So this frequency means we will be basically not updating the Q-target. Then the function approximation in the control part will be based on stale parameters that no longer reflect the current policy or value estimates. This can cause the network to learn from inaccurate targets, leading to poor performance or slow convergence.
+
+:::

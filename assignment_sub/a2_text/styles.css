@@ -1,0 +1,33 @@
+.answer {
+  color: #0077b6;
+  padding-left: 0px;
+}
+
+.answer-cont {
+  color: #0077b6;
+  padding-left: 2em;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+.lower-roman ol {
+  list-style-type: lower-roman;
+}
+
+.note {
+  color: #0077b6;
+  font-style: italic;
+  padding: 0px 10px 0px 10px;
+  border-left: 1px dashed #0077b6;
+}
+
+/* Only on figcaption elements that are immediate children of figure elements */
+figure>figcaption.quarto-float-caption-bottom {
+  text-align: center;
+}
+
+.smallcaps {
+  font-variant: small-caps;
+}
