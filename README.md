@@ -24,6 +24,10 @@ Also for spring 2024 offering.
 [Lecture materials](https://web.stanford.edu/class/cs234/CS234Spr2024/modules.html) |
 [Assignment files](https://web.stanford.edu/class/cs234/CS234Spr2024/assignments).
 
+## Known issues
+
+- For A2, the `gym==0.21` in the original requirements.txt may fail the installing because that version is not compatible with some newer setuptools ([../gym/issues/3176](https://github.com/openai/gym/issues/3176)). And even though there is setuptools==65.5.0 in the txt, pip creates an isolated temporary environment to build gym where the setuptools is of another version. For me (setuptools 75.7.0, doing A2 in May 2025), changing it to `gym>=0.21,<0.27` worked.
+
 ## Assignment previews
 
 These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at a top institution so these are probably very good references.
