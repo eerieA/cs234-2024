@@ -23,7 +23,7 @@ class BasePolicy:
         """
         raise NotImplementedError
 
-    def act(self, observations, return_log_prob = False):
+    def act(self, observations, return_log_prob=False):
         """
         Args:
             observations: np.array of shape [batch size, dim(observation space)]
@@ -35,7 +35,7 @@ class BasePolicy:
         Call self.action_distribution to get the distribution over actions,
         then sample from that distribution. Compute the log probability of
         the sampled actions using self.action_distribution. You will have to
-        convert the actions and log probabilities to a numpy array, via numpy(). 
+        convert the actions and log probabilities to a numpy array, via numpy().
 
         You may find the following documentation helpful:
         https://pytorch.org/docs/stable/distributions.html
@@ -43,7 +43,16 @@ class BasePolicy:
         observations = np2torch(observations)
         #######################################################
         #########   YOUR CODE HERE - 1-4 lines.    ############
-
+        """ distrib = self.action_distribution(observations=observations)
+        samples = sample from distrib (What func to use?)
+        log probs = for each sample return log(distrib(sample)) """
+        distrib = self.action_distribution(observations=observations)
+        sampled_actions = distrib.sample()
+        log_probs = distrib.log_prob(
+            sampled_actions
+        )  # log_prob expects a PyTorch tensor, not NumPy array
+        sampled_actions = sampled_actions.numpy()
+        log_probs = log_probs.numpy()
         #######################################################
         #########          END YOUR CODE.          ############
         if return_log_prob:
@@ -68,7 +77,11 @@ class CategoricalPolicy(BasePolicy, nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 1-2 lines.    ############
-
+        """ prob raw = each observation's probability in observations <- is just from self.network
+        probs = torch.tensor(prob raw)
+        distribution = Categorical(probs) """
+        probs = self.network(observations)
+        distribution = ptd.Categorical(logits=probs)
         #######################################################
         #########          END YOUR CODE.          ############
         return distribution
@@ -86,7 +99,7 @@ class GaussianPolicy(BasePolicy, nn.Module):
         self.network = network
         #######################################################
         #########   YOUR CODE HERE - 1 line.       ############
-
+        self.log_std = nn.Parameter(torch.zeros(action_dim))
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -100,7 +113,8 @@ class GaussianPolicy(BasePolicy, nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 1 line.       ############
-
+        """ std dev is just log(std dev) exponentiated """
+        std = torch.exp(self.log_std)
         #######################################################
         #########          END YOUR CODE.          ############
         return std
@@ -124,7 +138,13 @@ class GaussianPolicy(BasePolicy, nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 2-4 lines.    ############
-
+        """ diagonal Gaussian is a bunch of Gaussians (normal distribs) with no covariances pair-wise
+        so first get mean of each observation, get std dev of it, build a Gaussian,
+        then "pack" them together with 0 pair-wise covariances, i.e. pair-wise independent """
+        means = self.network(observations)  # or more commonly called loc
+        stds = self.std()  # or more commonly called scale
+        gaussians = ptd.Normal(means, stds)
+        distribution = ptd.Independent(gaussians, 1)
         #######################################################
         #########          END YOUR CODE.          ############
         return distribution
