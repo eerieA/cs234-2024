@@ -208,7 +208,7 @@ where $W \in \mathbb{R}^{3 \times 1}$ is a weight matrix, $b \in \mathbb{R}^{3}$
 
 ### Softmax function
 
-The softmax function, also known as softargmax or normalized exponential function, converts a tuple of K real numbers (`logits`) into a probability distribution of K possible outcomes. It is a generalization of the logistic function to multiple dimensions, and is used in multinomial logistic regression ([Wikipedia](https://en.wikipedia.org/wiki/Softmax_function)).
+The softmax function, also known as softargmax or normalized exponential function, converts a tuple of K real numbers (`logits` in the context of ML) into a probability distribution of K possible outcomes. It is a generalization of the logistic function to multiple dimensions, and is used in multinomial logistic regression ([Wikipedia](https://en.wikipedia.org/wiki/Softmax_function)).
 
 The standard (unit) softmax function
 
@@ -218,8 +218,10 @@ good for modelling a probability distribution.
 
 It is smooth and differentiable, which is essential for gradient-based optimization (like backpropagation).
 
-One intuition is `bigger values become exponentially more dominant`. To have more control, there is the introduction of a "tempratured" version
+One intuition is `bigger values become exponentially more dominant`. To have more control, there is the introduction of a "temperatured" version
+
 $$\text{softmax}_T(x_i) = \frac{e^{{x_i/T}}}{\sum_{j=1}^{n} e^{x_j/T}},$$
+
 where the $T$ has effects:
 - High $T$ → softer distribution.
 - Low $T$ → sharper distribution.
