@@ -6,6 +6,26 @@ This repo contains Stanford CS234 **2024 spring** assignment's coding problems (
 
 If further interested, [this link](https://web.stanford.edu/class/cs234/modules.html) contains entire public-access course materials for the **latest** offering, for example, winter 2025. Due to being different offerings, please be advised that the assignments in this repo may not match the latest course content exactly.
 
+<!-- TOC -->
+
+- [CS234ReinforcementLearning (Spring 2024)](#cs234reinforcementlearning-spring-2024)
+        - [Attribution](#attribution)
+        - [Disclaimer](#disclaimer)
+    - [Official material links](#official-material-links)
+    - [Known issues](#known-issues)
+    - [Assignment previews](#assignment-previews)
+        - [A1P4: RiverSwim MDP](#a1p4-riverswim-mdp)
+        - [A2P2: Policy Gradient Methods](#a2p2-policy-gradient-methods)
+        - [A3P1-P3: Reward engineering, Learning from preferences(RLHF), Direct preference optimization(DPO)](#a3p1-p3-reward-engineering-learning-from-preferencesrlhf-direct-preference-optimizationdpo)
+            - [PPO (without early termination)](#ppo-without-early-termination)
+            - [PPO(with early termination)](#ppowith-early-termination)
+            - [RLHF](#rlhf)
+    - [Personal notes](#personal-notes)
+        - [Lecture notes](#lecture-notes)
+        - [Assignment Notes](#assignment-notes)
+
+<!-- /TOC -->
+
 ### Attribution
 
 Based on https://github.com/Rhyme0730/CS234-Reinforcement-Learning . Commits on and before Feb 4, 2025 were all made by the owner of that repo. Also there are *finished* assignment code in that repo. Please consider forking that repo if you don't need to make your own independent commits.
@@ -32,25 +52,44 @@ Also for spring 2024 offering.
 
 These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at a top institution so these are probably very good references.
 
-## A1_P4: RiverSwim MDP
+### A1_P4: RiverSwim MDP
 
 <img alt="A1 problem 4 figure" src="./A1_code/RiverSwim_MDP.png" width="600">
 
-## A2_P2: Policy Gradient Methods
+### A2_P2: Policy Gradient Methods
 
 <img alt="A2 problem 2 figure" src="./A2_code/code/results/results-cartpole.png" width="300">
 
-## A3_P1-P3: Reward engineering, Learning from preferences(RLHF), Direct preference optimization(DPO)
+### A3_P1-P3: Reward engineering, Learning from preferences(RLHF), Direct preference optimization(DPO)
 
-### PPO (without early termination)
+#### PPO (without early termination)
 
 <img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="300">
 
-### PPO(with early termination)
+#### PPO(with early termination)
 
 <img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="300">
 
-### RLHF
+#### RLHF
 
 <img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="300">
 
+## Personal notes
+
+Made mostly because I did not take the pre-requisite Machine Learning course at the first time of going through this course.
+
+### Lecture notes
+
+[./notes/NOTES_LECTURES.md](./notes/NOTES_LECTURES.md)
+
+Includes:
+
+- Some hand-written process for worked examples mentioned in lectures.
+- Some notes on pre-requisite knowledge points, e.g. maximum likelihood estimation (MLE).
+
+### Assignment Notes
+
+[./notes/NOTES_ASGNMTS.md](./notes/NOTES_ASGNMTS.md)
+
+Includes:
+- Notes on some pre-requisite knowledge points, e.g. backpropagation, ReLU, etc.
