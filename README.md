@@ -1,6 +1,6 @@
 # CS234_Reinforcement_Learning (Spring 2024)
 
-<img alt="Course cover image" src="./Fig/RL.png" width="300">
+<img alt="Course cover image" src="./RL.png" width="300">
 
 This repo contains Stanford CS234 **2024 spring** assignment's coding problems (*unfilled* templates), and some personal notes after watching the free video lectures on Youtube (also for 2024 spring).
 
