@@ -47,7 +47,29 @@ class PPO(PolicyGradient):
 
         #######################################################
         #########   YOUR CODE HERE - 10-15 lines.   ###########
+        """ core optim objective is L_{\theta_k}^{CLIP} = expectance(\sum min(r_t(\theta)\hat{A}_t^{\pi_k}, clipped value))
+        , where \hat{A}_t^{\pi_k} is advantages reweighted by importance ratio of new/old policies.
+        we want to maximize this objective. So need:
+            current policy network, advantages, importance ratio, new & old log probs (policies), clip epsilon. """
+        # Get new log probs of current policy
+        distribs = self.policy.action_distribution(observations=observations)
+        log_probs = distribs.log_prob(actions)
 
+        # Get importance ratio
+        iratios = torch.exp(log_probs - old_logprobs)
+
+        # Get unclipped reweighted sum of \hat{A}_... and also the clipped one
+        unclipped = iratios * advantages
+        clipped_iratios = torch.clamp(iratios, 1 - self.eps_clip, 1 + self.eps_clip)
+        clipped = clipped_iratios * advantages
+
+        # Main objective
+        loss = -torch.mean(torch.min(unclipped, clipped))
+
+        # Regular optimizer utilization stuff
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
         #######################################################
         #########          END YOUR CODE.          ############
 

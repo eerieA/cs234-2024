@@ -26,7 +26,13 @@ class BaselineNetwork(nn.Module):
 
         #######################################################
         #########   YOUR CODE HERE - 2-8 lines.   #############
-
+        """ baseline value should be only dependent on state, and build_mlp is mapping some input vars (observations here)
+        to a parametrization over some output vars. So the output size is 1 here, like a V_{\theta}^{\pi}(s) """
+        self.network = build_mlp(
+            input_size=observation_dim, output_size=1,
+            n_layers=config.n_layers, size=config.layer_size,
+        ).to(device)
+        self.optimizer = torch.optim.Adam(self.network.parameters(), lr=self.lr)
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -50,7 +56,7 @@ class BaselineNetwork(nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 1 lines.     #############
-
+        output = self.network(observations).squeeze(-1)
         #######################################################
         #########          END YOUR CODE.          ############
         assert output.ndim == 1
@@ -78,7 +84,14 @@ class BaselineNetwork(nn.Module):
         observations = np2torch(observations)
         #######################################################
         #########   YOUR CODE HERE - 1-4 lines.   ############
-
+        """ advantages = sum of returns from t onwards - baseline values
+            baseline values is actually the forwarded (evaluated) values from
+            the current baseline (neural network) """
+        with torch.no_grad():   # just evaluating does not need grads
+            # Reminder that self(observations) will call the forward() method
+            # Also need to move from GPU to CPU
+            baseline_values = self(observations).cpu().numpy()
+        advantages = returns - baseline_values
         #######################################################
         #########          END YOUR CODE.          ############
         return advantages
@@ -100,6 +113,14 @@ class BaselineNetwork(nn.Module):
         observations = np2torch(observations)
         #######################################################
         #########   YOUR CODE HERE - 4-10 lines.  #############
-
+        self.optimizer.zero_grad()  # clear grads
+        evaluated = self(observations)
+        """ Re-fit baseline by minimizing \sum_i\sum_t|b(s_t^i) - G_t^i|^2, where G is in the returns here
+        torch.nn.functional.mse_loss(
+            input, target, size_average=None, reduce=None, reduction="mean", weight=None
+        ) """
+        loss = nn.functional.mse_loss(input=evaluated, target=returns)
+        loss.backward()
+        self.optimizer.step()
         #######################################################
         #########          END YOUR CODE.          ############

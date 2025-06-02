@@ -81,7 +81,7 @@ class PolicyGradient(object):
         if self.discrete is True:
             self.policy = CategoricalPolicy(policy_network) # actions are discrete, categorical policy
         else:
-            self.policy = GaussianPolicy(policy_network)    # actions are continuous, gaussian policy
+            self.policy = GaussianPolicy(policy_network, action_dim=self.action_dim)    # actions are continuous, gaussian policy
         
         self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=self.lr)
         #######################################################
