@@ -4,5 +4,9 @@ assignment_sub/*/*_files/
 assignment_sub/*/.jupyter_cache/
 
 # Python related
-*venv/
+*venv*/
 *__pycache__
+
+# Temp files
+*.npy
+log*

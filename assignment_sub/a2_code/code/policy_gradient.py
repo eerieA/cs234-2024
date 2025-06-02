@@ -72,7 +72,18 @@ class PolicyGradient(object):
         """
         #######################################################
         #########   YOUR CODE HERE - 8-12 lines.   ############
-
+        policy_network = build_mlp(
+            input_size=self.observation_dim, output_size=self.action_dim,
+            n_layers=self.config.n_layers, size=self.config.layer_size,
+        )
+        policy_network = policy_network.to(device)
+        
+        if self.discrete is True:
+            self.policy = CategoricalPolicy(policy_network) # actions are discrete, categorical policy
+        else:
+            self.policy = GaussianPolicy(policy_network)    # actions are continuous, gaussian policy
+        
+        self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=self.lr)
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -190,7 +201,16 @@ class PolicyGradient(object):
             rewards = path["reward"]
             #######################################################
             #########   YOUR CODE HERE - 5-10 lines.   ############
-
+            """ returns for this path = all zeros
+            G = 0 <- to store G_t for a paritular t
+            for t in number of actions in path
+                G += (self.config.gamma)^t * path['reward'][t] or
+                G = self.config.gamma*(G from previous iter) + path['reward'][t] """
+            returns = np.zeros_like(rewards, dtype=np.float32)
+            G = 0
+            for t in reversed(range(len(rewards))):
+                G = rewards[t] + self.config.gamma * G
+                returns[t] = G
             #######################################################
             #########          END YOUR CODE.          ############
             all_returns.append(returns)
@@ -215,7 +235,12 @@ class PolicyGradient(object):
         """
         #######################################################
         #########   YOUR CODE HERE - 1-2 lines.    ############
-
+        """ get the arithmetic mean of the advantages, minus each advantage by the mean
+        use mean absolute deviation x_{MAD} = (x - \mu)/MAD to scale
+            or use the z-score scaling z = (x - \mu)/\sigma """
+        avg = np.mean(advantages)
+        std = np.std(advantages) + 1e-8
+        normalized_advantages = (advantages - avg) / std
         #######################################################
         #########          END YOUR CODE.          ############
         return normalized_advantages
@@ -268,7 +293,20 @@ class PolicyGradient(object):
         advantages = np2torch(advantages)
         #######################################################
         #########   YOUR CODE HERE - 5-7 lines.    ############
+        """ \mathcal{L} = - expectance(log of \pi_{\theta})(a|s) * advantage) """
+        self.optimizer.zero_grad()  # Clear gradients, clean start
 
+        # Reminder that action_distribution() returns distribution(s)
+        distribs = self.policy.action_distribution(observations=observations)
+        log_probs = distribs.log_prob(actions)
+
+        if len(log_probs.shape) > 1:
+            # What to do if the distribution(s) is multivariate
+            log_probs = log_probs.sum(axis=1)
+
+        loss = -(log_probs * advantages).mean() # this is the loss compared to the Q-target
+        loss.backward()  # backprop, like computing grads to see how paraments contrib to the loss
+        self.optimizer.step()  # take one step in the negative gradient direction
         #######################################################
         #########          END YOUR CODE.          ############
 

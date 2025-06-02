@@ -52,7 +52,7 @@ class BasePolicy:
             sampled_actions
         )  # log_prob expects a PyTorch tensor, not NumPy array
         sampled_actions = sampled_actions.numpy()
-        log_probs = log_probs.numpy()
+        log_probs = log_probs.detach().numpy()
         #######################################################
         #########          END YOUR CODE.          ############
         if return_log_prob:
