@@ -14,6 +14,8 @@
         - [Softmax function](#softmax-function)
         - [Gaussian policy](#gaussian-policy)
             - [Example](#example)
+        - [Diagonal Gaussian](#diagonal-gaussian)
+            - [Example](#example)
 
 <!-- /TOC -->
 
@@ -257,3 +259,56 @@ Then:
 $$a \sim \mathcal{N}(0.2, 0.01).$$
 
 So the car will usually turn slightly right, but with some randomness for exploration.
+
+### Diagonal Gaussian
+
+Means a bunch of Gaussian distributed variables that are independent, whose aggregated covariance matrix is thus diagonal.
+
+So need torch.distributions.independent.`Independent` for it, no input for covariance. Relevantly but contrastingly, if they were not diagonal, we would need to use torch.distributions.multivariate_normal.`MultivariateNormal`, and supply a covariance matrix.
+
+#### Example
+
+> Suppose:
+> 
+>     loc = torch.tensor([[0.0, 1.0], [2.0, 3.0]])   # shape: [2, 2]
+>     scale = torch.tensor([[1.0, 1.0], [0.5, 0.5]]) # shape: [2, 2]
+>     base_dist = torch.distributions.Normal(loc, scale)
+> 
+> This is a 2×2 batch of independent Normal distributions. PyTorch interprets this as:
+> 
+> - 2 batches
+> - Each batch has 2 independent scalars
+> 
+> With Independent:
+> 
+>     dist = torch.distributions.Independent(base_dist, 1)
+> 
+> This reinterprets the last 1 dimension (the 2 values per sample) as part of a single event. Now each sample is a 2D vector from a diagonal multivariate normal:
+> 
+> - dist.sample() → shape [2, 2]
+> - dist.log_prob(sample) → shape [2] (not [2, 2])
+> 
+> It adds log-probabilities across the "reinterpreted" dimensions. That is:
+> 
+>     dist.log_prob(x) = sum_i base_dist.log_prob(x_i)
+> 
+> So even though Normal(loc, scale) is univariate, wrapping with Independent makes it equivalent to a multivariate diagonal Gaussian.
+> 
+> This eventually builds 4 variables with normal distribution.
+> 
+> | Index   | Mean (μ) | Std Dev (σ) |
+> | ------- | -------- | ----------- |
+> | \[0, 0] | 0.0      | 1.0         |
+> | \[0, 1] | 1.0      | 1.0         |
+> | \[1, 0] | 2.0      | 0.5         |
+> | \[1, 1] | 3.0      | 0.5         |
+> 
+
+The reason for using a 2×2 tensor instead of a flat 1D vector like [0.0, 1.0, 2.0, 3.0] in this example is to simulate a batch of vector actions. For example, in most continuous control tasks (e.g. MuJoCo, robotics), actions are vectors:
+
+- dim(action space) might be 2, 4, or even 17 (for a humanoid).
+
+We often compute a batch of such actions, e.g. for rollout or training. So we get:
+
+- loc of shape [batch_size, action_dim],
+- scale of shape [batch_size, action_dim].
