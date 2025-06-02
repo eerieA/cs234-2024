@@ -8,7 +8,7 @@
             - [Example](#example)
             - [Example with Numbers (1 Neuron)](#example-with-numbers-1-neuron)
         - [Activation functions](#activation-functions)
-        - [What is ReLu](#what-is-relu)
+        - [What is ReLU](#what-is-relu)
         - [Categorical policy](#categorical-policy)
             - [Example](#example)
         - [Softmax function](#softmax-function)
@@ -16,6 +16,7 @@
             - [Example](#example)
         - [Diagonal Gaussian](#diagonal-gaussian)
             - [Example](#example)
+        - [Simple example for REINFORCE with b(s)](#simple-example-for-reinforce-with-bs)
 
 <!-- /TOC -->
 
@@ -171,7 +172,7 @@ This just means that if I graph a variable on the horizontal axis, and my predic
     - No or linear activation function → boring straight-line thinking.
     - With activation function → the network can think in curves, twists, and jumps — real-world stuff.
 
-### What is ReLu
+### What is ReLU
 
 ReLU, short for Rectified Linear Unit:
 
@@ -312,3 +313,70 @@ We often compute a batch of such actions, e.g. for rollout or training. So we ge
 
 - loc of shape [batch_size, action_dim],
 - scale of shape [batch_size, action_dim].
+
+
+### Simple example for REINFORCE with b(s)
+
+This example illustrates how a baseline network is used to compute advantages and improve training in policy gradient methods.
+
+---
+
+Training an agent in a simple environment. Suppose we collect one trajectory (episode) with the following data:
+
+| Timestep (t) | Observation \(s_t\) | Action \(a_t\) | Reward \(r_t\) |
+|--------------|---------------------|----------------|----------------|
+| 0            | [1.0, 0.0]          | 1              | +1             |
+| 1            | [0.5, 0.5]          | 0              | +1             |
+| 2            | [0.0, 1.0]          | 1              | +2             |
+
+---
+
+**Step 1**: Compute returns
+
+Using $\gamma = 1.0$ (no discounting), compute the total future return $R_t$ for each timestep:
+
+- $R_0 = 1 + 1 + 2 = 4$
+- $R_1 = 1 + 2 = 3$
+- $R_2 = 2$
+
+```{python}
+returns = np.array([4.0, 3.0, 2.0])
+```
+
+**Step 2**: Baseline network predictions
+Suppose our baseline network predicts (forward evaluate) the value of each state:
+
+- $V([1.0,0.0])=2.5$
+- $V([0.5,0.5])=2.8$
+- $V([0.0,1.0])=2.2$
+
+```{python}
+baseline_preds = np.array([2.5, 2.8, 2.2])
+```
+
+**Step 3**: Compute advantages
+The advantage function $A(s_t,a_t) = R_t - V(s_t)$:
+
+```{python}
+advantages = returns - baseline_preds
+           = [4.0, 3.0, 2.0] - [2.5, 2.8, 2.2]
+           = [1.5, 0.2, -0.2]
+```
+
+These are used to weight the policy gradients:
+
+- Positive → encourage action.
+- Negative → discourage action.
+
+**Step 4**: Train the baseline network
+
+Using Mean Squared Error (MSE) between returns and predictions:
+
+```{python}
+mse = np.mean((returns - baseline_preds)**2)
+    = np.mean([1.5², 0.2², (-0.2)²])
+    = np.mean([2.25, 0.04, 0.04])
+    = 0.7767
+```
+
+This loss is used in update_baseline() to improve the value predictions.
