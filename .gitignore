@@ -10,3 +10,9 @@ assignment_sub/*/.jupyter_cache/
 # Temp files
 *.npy
 log*
+
+# A2 Q2 results, i.e. rewards (scores) in iterations
+# we only need the plots based on them, so ignore these
+assignment_sub/*/results/*-baseline*/
+assignment_sub/*/results/*-no_baseline*/
+assignment_sub/*/results/*-ppo*/

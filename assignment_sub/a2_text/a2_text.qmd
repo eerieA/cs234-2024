@@ -232,3 +232,58 @@ Across most seeds:
    - **cartpole**: Should reach the max reward of 200 (although it may not stay there)
    - **pendulum**: Should reach the max reward of 1000 (although it may not stay there)
    - **cheetah**: Should reach at least 200 (could be as large as 900)
+
+::: {.answer}
+1. Noticing the recurrence
+$$G_t = r_t + \gamma G_{t+1},
+$$
+which is in a "backwards" fashion, we can first easily calculate $G_T = \sum_{t'=T}^T \gamma^{t'-t} r_{t'} = \gamma^{T-T} r_T = 0$, and then compute with 2 (constant number of) FLOPs each iteration. This will result in $\mathcal{O}(T)$ time complexity.
+
+2. The gradient of the clipped PPO loss becomes zero in the following cases:
+  <ul>
+  <li>$r(\theta)>1+\epsilon$ and $\hat{A}>0$.</li>
+  <li>$r(\theta)>1-\epsilon$ and $\hat{A}<0$.</li>
+  </ul>
+This happens because PPO uses a clipped surrogate objective to prevent large policy updates. If the policy changes too much and the advantage encourages further change, the objective is clipped flat, and its gradient becomes zero. We have also seen a simple demonstration of this in the lecture:
+<br>
+![Emma Brunskill, Policy Search 2 2024 Lecture 6; [source](https://youtu.be/8PwvNQ5WS-o?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX&t=4177)](fig01.jpg){#fig-zerograd-lec width=80%}
+<br><br>
+Gradients can also be zero at local minima, maxima, or saddle points in general optimization. But in PPO, the gradient becoming zero is typically a direct consequence of the clipped objective.
+
+3. REINFORCE does not need to cache the log-probabilities because it computes them using the current policy during the update. However, PPO needs to compute the ratio of new to old action probabilities, which requires the log-probabilities under the old policy of previous iteration.
+<br>
+If log-probabilities had not been cached in PPO, we would need to:
+  <ul>
+  <li>Store a full copy of the old policy.</li>
+  <li>Recompute all action log-probs using this old policy during update.</li>
+  </ul>
+This would unneccesarrily complicate the code and increase memory usage.
+
+4. Cartpole:
+<br>
+![Plot for Cartpole environment](../a2_code/results/results-cartpole.png){#fig-plot-cartpole width=60%}.
+<br>
+Pendulum:
+<br>
+![Plot for Pendulum environment](../a2_code/results/results-pendulum.png){#fig-plot-pendulum width=60%}.
+<br>
+Cheetah:
+<br>
+![Plot for Cheetah environment](../a2_code/results/results-cheetah.png){#fig-plot-cheetah width=60%}.
+<br>
+Below are some observations from reading the plots.
+<br>
+Cartpole and Pendulum:
+<ul>
+<li>PG with baseline learns faster than PG without baseline, confirming the variance reduction effect of using a baseline.</li>
+<li>PPO shows the fastest learning and highest final reward in both environments. It benefits from stable updates using the clipped objective and multiple update steps.</li>
+<li>All methods eventually approach optimal reward (200 for Cartpole, 1000 for Pendulum), but PPO does so more efficiently.</li>
+</ul>
+<br>
+Cheetah:
+<ul>
+<li>Performance across methods is more variable, possibly due to the environment’s complexity.</li>
+<li>This time PPO does not show a clear advantage in terms of faster convergence; but it seems to achieve more stable rewards across iterations.</li>
+<li>This suggests that PPO’s clipping mechanism and repeated updates help maintain consistent policy improvements in more challenging settings.</li>
+</ul>
+:::
