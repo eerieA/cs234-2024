@@ -57,8 +57,8 @@ For me (Python 3.13, setuptools 75.7.0, doing A2 in May 2025), changing it to gy
     ...RuntimeWarning: Degrees of freedom <= 0 for slice
         ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,...
     ```
-    This might be due to how the plot.py reads data? But despite the error, it seems the plot can still be correctly reflecting the data for only seed 1. So I would suggest ignoring this.  
-    Or, if you have time, run all three methods with Cheetah for another seed number, and run plot.py again, the error will disappear.
+    This might be due to how the plot.py reads data? But despite the error, it seems the plot can still be correctly reflecting the data. So we can likely ignore this.  
+    Or, if you have time, run all three methods with Cheetah for another seed number, and run plot.py again with 2 seed numbers, the error will disappear.
 
 ## Assignment previews
 
