@@ -9,11 +9,11 @@
 }
 
 ol {
-  list-style-type: decimal;
+  list-style-type: lower-alpha;
 }
 
-.lower-roman ol {
-  list-style-type: lower-roman;
+.numeric ol {
+  list-style-type: decimal;
 }
 
 .note {

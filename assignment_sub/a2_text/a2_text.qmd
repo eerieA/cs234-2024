@@ -287,3 +287,194 @@ Cheetah:
 <li>This suggests that PPO’s clipping mechanism and repeated updates help maintain consistent policy improvements in more challenging settings.</li>
 </ul>
 :::
+
+## Distributions induced by a policy (13 pts)
+
+Suppose we have a single MDP and two policies for that MDP, $\pi$ and $\pi'$. Naturally, we are often interested in the performance of policies obtained in the MDP, quantified by $V^{\pi}$ and $V^{\pi'}$, respectively. If the reward function and transition dynamics of the underlying MDP are known to us, we can use standard methods for policy evaluation. There are many scenarios, however, where the underlying MDP model is not known and we must try to infer something about the performance of policy $\pi'$ solely based on data obtained through executing policy $\pi$ within the environment. In this problem, we will explore a classic result for quantifying the gap in performance between two policies that only requires access to data sampled from one of the policies. 
+
+Consider an infinite-horizon MDP $\mathcal{M} = \langle \mathcal{S}, \mathcal{A}, \mathcal{R}, \mathcal{P}, \gamma \rangle$ and stochastic policies of the form $\pi: \mathcal{S} \rightarrow \Delta(\mathcal{A})$\footnote{For a finite set $\mathcal{X}$, $\Delta(\mathcal{X})$ refers to the set of categorical distributions with support on $\mathcal{X}$ or, equivalently, the $\Delta^{|\mathcal{X}|-1}$ probability simplex.}. Specifically, $\pi(a|s)$ refers to the probability of taking action $a$ in state $s$, and $\sum_a \pi(a|s) = 1, \text{ } \forall s$. For simplicity, we'll assume that this decision process has a single, fixed starting state $s_{0} \in \mathcal{S}$. 
+
+a. **(3 pts) (written)** Consider a fixed stochastic policy and imagine running several rollouts of this policy within the environment. Naturally, depending on the stochasticity of the MDP $\mathcal{M}$ and the policy itself, some trajectories are more likely than others. Write down an expression for $\rho^\pi(\tau)$, the probability of sampling a trajectory $\tau = (s_0,a_0,s_1,a_1,\ldots)$ from running $\pi$ in $\mathcal{M}$. To put this distribution in context, recall that $V^\pi(s_0) = \mathbb{E}_{\tau \sim \rho^\pi}\left[\sum\limits_{t=0}^\infty \gamma^t \mathcal{R}(s_t,a_t) \,|\, s_0\right].$
+
+b. **(1 pt) (written)** What is $p^\pi(s_t=s)$, where $p^\pi(s_t = s)$ denotes the probability of being in state $s$ at timestep $t$ while following policy $\pi$? (Provide an equation)
+
+c. **(5 pts) (written)** Just as $\rho^\pi$ captures the distribution over trajectories induced by $\pi$, we can also examine the distribution over states induced by $\pi$. In particular, define the *discounted, stationary state distribution* of a policy $\pi$ as 
+$$d^\pi(s) = (1-\gamma) \sum\limits_{t=0}^\infty \gamma^t p^{\pi}(s_t = s),
+$$
+where $p^\pi(s_t = s)$ denotes the probability of being in state $s$ at timestep $t$ while following policy $\pi$; your answer to the previous part should help you reason about how you might compute this value.
+<br>
+The value function of a policy $\pi$ can be expressed using this distribution $d^{\pi}(s,a) = d^{\pi}(s) \pi(a \mid s)$ over states and actions, which will shortly be quite useful.
+<br>
+Consider an arbitrary function $f: \mathcal{S} \times \mathcal{A} \rightarrow \mathbb{R}$. Prove the following identity: 
+$$\mathbb{E}_{\tau \sim \rho^\pi}\left[\sum\limits_{t=0}^\infty \gamma^t f(s_t,a_t)\right] = \frac{1}{(1-\gamma)} \mathbb{E}_{s \sim d^\pi}\left[\mathbb{E}_{a \sim \pi(s)}\left[f(s,a)\right]\right] .
+$$
+<br>
+*Hint: You may find it helpful to first consider how things work out for $f(s,a) = 1, \forall (s,a) \in \mathcal{S} \times \mathcal{A}$.*
+
+d. **(5 pts) (written)** For any policy $\pi$, we define the following function 
+$$
+A^\pi(s,a) = Q^\pi(s,a) - V^\pi(s).$$
+$A^\pi(s,a)$ is known as the advantage function and shows up in a lot of policy gradient based RL algorithms, which we shall see later in the class. Intuitively, it is the additional benefit one gets from first following action $a$ and then following $\pi$, instead of always following $\pi$. Prove that the following statement holds for all policies $\pi,\pi'$: 
+$$V^\pi(s_0) - V^{\pi'}(s_0) = \frac{1}{(1-\gamma)} \mathbb{E}_{s \sim d^\pi}\left[\mathbb{E}_{a \sim \pi(s)}\left[A^{\pi'}(s,a)\right]\right].$$
+<br>
+*Hint 1: Try adding and subtracting a term that will let you bring $A^{\pi'}(s,a)$ into the equation. What happens on adding and subtracting $\sum\limits_{t=0}^\infty \gamma^{t+1} V^{\pi'}(s_{t+1})$ on the LHS?*
+<br>
+*Hint 2: Recall the [tower property of expectation](https://en.wikipedia.org/wiki/Law_of_total_expectation) which says that $\mathbb{E}\left[X\right] = \mathbb{E}\left[\mathbb{E}\left[X \mid Y\right]\right]$.*
+<br><br>
+After proving this result, you might already begin to appreciate why this represents a useful theoretical contribution. We are often interested in being able to control the gap between two value functions and this result provides a new mechanism for doing exactly that, when the value functions in question belong to two particular policies of the MDP. 
+<br>
+Additionally, to see how this result is of practical importance as well, suppose the data-generating policy in the above identity $\pi$ is some current policy we have in hand and $\pi'$ represents some next policy we would like to optimize for; concretely, this scenario happens quite often when $\pi$ is a neural network and $\pi'$ denotes the same network with updated parameters. As is often the case with function approximation, there are sources of instability and, sometimes, even small parameter updates can lead to drastic changes in policy performance, potentially degrading (instead of improving) the performance of the current policy $\pi$. These realities of deep learning motivate a desire to occasionally be conservative in our updates and attempt to reach a new policy $\pi'$ that provides only a modest improvement over $\pi$. Practical approaches can leverage the above identity to strike the right balance between making progress and maintaining stability.
+
+<div class="answer">
+a. Thinking about one tragectory under this policy, denote it as  $\tau = (s_0,a_0,s_1,a_1,\ldots)$. Then using joint probablity of independent events we have the probability of this tragectory happening is
+$$
+\rho^{\pi}(\tau) = \pi(a_0 | s_0) \cdot p(s_1 | s_0, a_0) \cdot \pi(a_1 | s_1) \cdot p(s_2 | s_1, a_1) \ldots
+$$
+, where $p(s_t | s_{t-1}, a{t-1})$ is the probabilty of being in $s_t$ given the agent has taken $a{t-1}$ at $s_{t-1}$ at previous step.
+<br>
+Rewrite this in product notation, we obtain
+$$\rho^{\pi}(\tau) = \Pi_{t=0}^{\infty} \; \left[\pi(a_t | s_t) \cdot p(s_{t+1} | s_t, a_t) \right].
+$$
+
+b. Suppose under policy $\pi$ there is a set of possible tragectories {$\tau_{0}, \tau_{1}, \tau_{2}, \ldots$}, then for each tragectory, the probability of being in a certain state $s$ at timestep $t$ is either $1$ if it contains it exactly, or $0$ if it does not. So the total probability of being in a certain state $s$ at timestep $t$ is
+$$\rho^{\pi}(\tau_1) \cdot \delta(\tau_1, s) + \rho^{\pi}(\tau_2) \cdot \delta(\tau_2, s) + \ldots
+$$
+, where $\delta(\tau, s)$ is
+$$
+\delta(\tau, s) = \begin{cases}
+                0, & \text{if $\tau$ has $s$ at $t$}\\
+                1, & \text{otherwise}.
+                \end{cases}
+$$
+So writing it in compact form with sum is
+$$p^\pi(s_t=s) = \sum_{\tau \sim \rho^{\pi}} \rho^{\pi}(\tau) \cdot \delta(\tau, s).
+$$
+We can also view it from a state transition perspective. For a certain state $s$ to be at time $t$, unless $s$ is some trajectory's starting state, it would have a previous state at time $t-1$. So we can define $p^\pi(s_t=s)$ recursively:
+$$p^\pi(s_t=s) = \sum_{s'} \sum_{a'} p_p(s_{t-1} = s') \pi(a' | s') p(s | a', s'),
+$$
+where the base case of $p_p(s_{t-1} = s')$ is
+$$
+p_p(s_0 = s') = \begin{cases}
+                1, & \text{if $s'$ is at tragectory start}\\
+                0, & \text{otherwise}.
+                \end{cases}
+$$
+
+c. Using the linearity of expectations on the LHS:
+$$
+\begin{array}{rl}
+LHS = & \mathbb{E}_{\tau \sim \rho^\pi} \left[ \sum_{t=0}^\infty \gamma^t f(s_t, a_t) \right] \\
+= & \sum_{t=0}^\infty \gamma^t \mathbb{E}_{s_t \sim p^\pi, a_t \sim \pi}[f(s_t, a_t)]
+\end{array}
+$$
+Notice that we can expand the expectation into a sum:
+$$\mathbb{E}_{s_t \sim p^\pi, a_t \sim \pi}[f(s_t, a_t)] = \sum_s p^\pi(s_t = s) \sum_a \pi(a | s) f(s,a).
+$$
+With that and the Fubini's theorem for infinite series [@statslibre_49; @wikipedia_fubinis_2025], we can continue to rewrite the LHS in terms of state and action distributions, with changed order of sums:
+$$
+\begin{array}{rl}
+LHS
+= & \sum_{t=0}^\infty \gamma^t \sum_s p^\pi(s_t = s) \sum_a \pi(a | s) f(s,a) \\
+= & \sum_s \sum_a f(s,a) \sum_{t=0}^\infty \gamma^t p^\pi(s_t = s) \pi(a | s)
+\end{array}
+$$
+By the definition of the $d^{\pi}(s)$:
+$$
+\begin{array}{rl}
+ & d^\pi(s) = (1 - \gamma) \sum_{t=0}^\infty \gamma^t p^\pi(s_t = s) \\
+\Rightarrow
+ & \sum_{t=0}^\infty \gamma^t p^\pi(s_t = s) = \frac{d^\pi(s)}{1 - \gamma}
+\end{array}
+$$
+So
+$$
+\begin{array}{rl}
+LHS
+= & \sum_s \sum_a f(s,a) \cdot \frac{d^\pi(s)}{1 - \gamma} \cdot \pi(a | s) \\
+= & \frac{1}{1 - \gamma} \sum_s d^\pi(s) \sum_a \pi(a | s) f(s,a) \\
+= & \frac{1}{1 - \gamma} \mathbb{E}_{s \sim d^\pi, a \sim \pi(s)}[f(s,a)] \\
+= & RHS. \quad \blacksquare
+\end{array}
+$$
+
+d. It is known that
+$$
+V^\pi(s_0) = \mathbb{E}_{\tau \sim \rho^\pi} \left[ \sum_{t=0}^\infty \gamma^t \mathcal{R}(s_t, a_t) | s_0 \right].
+$$
+Following the hints, we want to add a $\sum_{t=0}^\infty \gamma^{t+1}V^{\pi'}(s_{t+1})$ to $V^\pi(s_0)$, but we also want it to relate to $V^{\pi'}(s_0)$. So construct this telescoping term
+$$
+\sum_{t=0}^\infty \left( \gamma^{t+1} V^{\pi'}(s_{t+1}) - \gamma^{t} V^{\pi'}(s_t) \right), \tag{1}
+$$
+because it equals to
+$$\begin{array}{rl}
+  = & \gamma^{t+1}V^{\pi'}(s_{t+1}) - V^{\pi'}(s_0) \\
+\to & - V^{\pi'}(s_0) \quad \text{as } t \to \infty.
+\end{array}
+$$
+<br>
+So we can add the term $(1)$ and subtract $- V^{\pi'}(s_0)$ from $V^\pi(s_0)$:
+$$
+\begin{array}{rl}
+& V^\pi(s_0) = \mathbb{E}_{\tau \sim \rho^\pi} \left[ \sum_{t=0}^\infty \left( \gamma^t\mathcal{R}(s_t, a_t) + \gamma^{t+1} V^{\pi'}(s_{t+1}) - \gamma^{t} V^{\pi'}(s_t) \right) \right] - (- V^{\pi'}(s_0)) \\
+\Rightarrow
+& V^\pi(s_0) - V^{\pi'}(s_0) = \mathbb{E}_{\tau \sim \rho^\pi} \left[ \sum_{t=0}^\infty \gamma^t \left( \mathcal{R}(s_t, a_t) + \gamma V^{\pi'}(s_{t+1}) - V^{\pi'}(s_t) \right) \right].
+\end{array}
+$$
+By the definition of $Q^{\pi'}(s,a)$ and the Bellman equation we have:
+$$
+\begin{array}{rc}
+& Q^{\pi'}(s,a) = \mathcal{R}(s,a) + \gamma \mathbb{E}_{s'}[V^{\pi'}(s')] \tag{2}
+\end{array}
+$$
+Replacing $s$ with $s_t$, $a$ with $a_t$ and $s'$ with $s_{t+1}$ in $(2)$, and using $(2)$ in the inner term, it then becomes:
+$$
+\mathcal{R}(s_t, a_t) + \gamma V^{\pi'}(s_{t+1}) - V^{\pi'}(s_t) = Q^{\pi'}(s,a) - V^{\pi'}(s) = A^{\pi'}(s_t, a_t).
+$$
+<br>
+The expectation in front of $V^{\pi'}(s')$ can be dropped because it is one specific trajectory represented in the inner term.
+<br>
+Following that, there is:
+$$
+V^\pi(s_0) - V^{\pi'}(s_0) = \mathbb{E}_{\tau \sim \rho^\pi} \left[ \sum_{t=0}^\infty \gamma^t A^{\pi'}(s_t, a_t) \right].
+$$
+We can now use the result from (c) on the RHS and obtain
+$$
+\begin{array}{rl}
+V^\pi(s_0) - V^{\pi'}(s_0) = & \frac{1}{1 - \gamma} \mathbb{E}_{s \sim d^\pi, a \sim \pi(s)} [A^{\pi'}(s,a)] \\
+  = & \frac{1}{1 - \gamma} \mathbb{E}_{s \sim d^\pi} \left[ \mathbb{E}_{a \sim \pi(s)} [A^{\pi'}(s,a)] \right] \quad \text{(the tower property).}
+\end{array}
+$$
+$\quad \blacksquare$
+</div>
+
+## Ethical concerns with Policy Gradients (5 pts)
+
+In this assignment, we focus on policy gradients, an extremely popular and useful model-free technique for RL. However, policy gradients collect data from the environment with a potentially suboptimal policy during the learning process. While this is acceptable in simulators like Mujoco or Atari, such exploration in real world settings such as healthcare and education presents challenges. 
+
+Consider a case study of a Stanford CS course considering introducing a RL-based chat bot for office hours.  For each assignment, some students will be given 100\% human CA office hours; others 100\% chatbot; others a mix of both. The reward signal is the student grades on each assignment. Since the AI chatbot will learn through experience, at any given point in the quarter, the help given by the chatbot might be better or worse than the help given by a randomly selected human CA.  
+
+If each time students are randomly assigned to each condition, some students will be assigned more chatbot hours and others fewer. In addition, some students will be assigned more chatbot hours at the beginning of the term (when the chatbot has had fewer interactions and may have lower effectiveness)  and fewer at the end, and vice versa.  All students will be graded according to the same standards, regardless of which type of help they have received.  
+
+Researchers who experiment on human subjects are morally responsible for ensuring their well being and protecting them from being harmed by the study. A foundational document in research ethics, the \href{https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/read-the-belmont-report/index.html#xethical}{Belmont Report}, identifies three core principles of responsible research:
+
+<div class="numeric">
+1. **Respect for persons:** individuals are capable of making choices about their own lives on the basis of their personal goals. Research participants should be informed about the study they are considering undergoing, asked for their consent, and not coerced into giving it. Individuals who are less capable of giving informed consent, such as young children, should be protected in other ways.
+2. **Beneficence:** the principle of beneficence describes an obligation to ensure the well-being of subjects. It has been summarized as “do not harm” or “maximize possible benefits and minimize possible harms.”
+3. **Justice:** the principle of justice requires treating all people equally and distributing benefits and harms to them equitably.
+</div>
+
+a. {(4 pts)} In 4-6 sentences, describe **two** experimental  design or research choices that researchers planning the above experiment ought to make in order to respect these principles. Justify the importance of these choices using one of the three ethical principles above and indicating which principle you have chosen. For example, “Researchers ought to ensure that students advised by the chatbot are able to revise their assignments after submission with the benefit of human advice if needed. If they did not take this precaution, the principle of justice would be violated because the risk of harm from poor advice from the AI chatbot would be distributed unevenly.” 
+
+At universities, research experiments that involve human subjects are subject by federal law to Institutional Review Board (IRB) approval.  The purpose of IRB is to protect human subjects of research: to “assure, both in advance and by periodic review, that appropriate steps are taken to protect the rights and welfare of humans participating as subjects in the research” (\href{https://www.fda.gov/about-fda/center-drug-evaluation-and-research-cder/institutional-review-boards-irbs-and-protection-human-subjects-clinical-trials}{reference}). The IRB process was established in response to abuses of human subjects in the name of medical research performed during WWII (\href{https://www.hhs.gov/ohrp/regulations-and-policy/belmont-report/read-the-belmont-report/index.html#xethical}{reference}). The IRB is primarily intended to address the responsibilities of the researcher towards the subjects. Familiarize yourself with Stanford’s IRB Research Compliance process at \href{https://researchcompliance.stanford.edu/panels/hs/forms/for-researchers#need}{this link}.
+
+b. {(1 pt)} If you were conducting the above experiment, what process would you need to follow at Stanford (who would you email/ where would you upload a research protocol) to get clearance?
+
+<div class="answer">
+a. 
+<ul>
+<li>Justice: Researchers ought to ensure that students who receive more chatbot support for assignments are assigned more human CA hours during office hours. This would help ensure that all students receive equitable academic assistance over time.</li>
+<li>Respect for persons: Researchers must disclose the nature and purpose of the experiment to students and offer them the opportunity to opt out. This is essential for respecting student autonomy, allowing them to make informed decisions about their involvement in a study that could impact their learning outcomes.</li>
+</ul>
+
+b. (I cannot answer this because I am not a student there.)
+</div>
