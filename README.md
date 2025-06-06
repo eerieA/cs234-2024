@@ -14,12 +14,14 @@ If further interested, [this link](https://web.stanford.edu/class/cs234/modules.
     - [Official material links](#official-material-links)
     - [Known issues](#known-issues)
     - [Assignment previews](#assignment-previews)
-        - [A1P4: RiverSwim MDP](#a1p4-riverswim-mdp)
-        - [A2P2: Policy Gradient Methods](#a2p2-policy-gradient-methods)
-        - [A3P1-P3: Reward engineering, Learning from preferences(RLHF), Direct preference optimization(DPO)](#a3p1-p3-reward-engineering-learning-from-preferencesrlhf-direct-preference-optimizationdpo)
-            - [PPO (without early termination)](#ppo-without-early-termination)
-            - [PPO(with early termination)](#ppowith-early-termination)
-            - [RLHF](#rlhf)
+        - [From an expert](#from-an-expert)
+            - [A1P4: RiverSwim MDP](#a1p4-riverswim-mdp)
+            - [A2P2: Policy Gradient Methods](#a2p2-policy-gradient-methods)
+            - [A3P1-P3: Reward engineering, RLHF, DPO](#a3p1-p3-reward-engineering-rlhf-dpo)
+        - [From this author](#from-this-author)
+            - [A1: RiverSwim](#a1-riverswim)
+            - [A2: REINFORCE and PPO](#a2-reinforce-and-ppo)
+            - [A3](#a3)
     - [Personal notes](#personal-notes)
         - [Lecture notes](#lecture-notes)
         - [Assignment Notes](#assignment-notes)
@@ -62,29 +64,49 @@ For me (Python 3.13, setuptools 75.7.0, doing A2 in May 2025), changing it to gy
 
 ## Assignment previews
 
+### From an expert
+
 These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at a top institution so these are probably very good references.
 
-### A1_P4: RiverSwim MDP
+#### A1_P4: RiverSwim MDP
 
-<img alt="A1 problem 4 figure" src="./A1_code/RiverSwim_MDP.png" width="600">
+<img alt="A1 problem 4 figure" src="./A1_code/RiverSwim_MDP.png" width="500px">
 
-### A2_P2: Policy Gradient Methods
+#### A2_P2: Policy Gradient Methods
 
 <img alt="A2 problem 2 figure" src="./A2_code/code/results/results-cartpole.png" width="300">
 
-### A3_P1-P3: Reward engineering, Learning from preferences(RLHF), Direct preference optimization(DPO)
+#### A3_P1-P3: Reward engineering, RLHF, DPO
 
-#### PPO (without early termination)
+| PPO (without early termination)  | PPO(with early termination) | RLHF |
+| ----------- | ----------- | ----------- |
+| <img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="85%"> | <img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="85%"> | <img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="100%"> |
 
-<img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="300">
+---
 
-#### PPO(with early termination)
+### From this author
 
-<img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="300">
+In case anyone wants more references.
 
-#### RLHF
+#### A1: RiverSwim
 
-<img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="300">
+This is a screenshot of output after running the filled-out program.
+
+<img alt="A1 coding task result" src="./assignment_sub/previews/a1.jpg" width="300px">
+
+> Written part is at [a1_text.pdf](./assignment_sub/a1_text.pdf).
+
+#### A2: REINFORCE and PPO
+
+| Cartpole  | Pendulum | Cheetah |
+| ----------- | ----------- | ----------- |
+| <img alt="A2 coding task plot 1" src="./assignment_sub/a2_code/results/results-cartpole.png" width="100%"> | <img alt="A2 coding task plot 2" src="./assignment_sub/a2_code/results/results-pendulum.png" width="100%"> | <img alt="A2 coding task plot 3" src="./assignment_sub/a2_code/results/results-cheetah.png" width="100%"> |
+
+> Written part is at [a2_text.pdf](./assignment_sub/a2_text.pdf).
+
+#### A3
+
+(TBC)
 
 ## Personal notes
 
