@@ -14,11 +14,11 @@ If further interested, [this link](https://web.stanford.edu/class/cs234/modules.
     - [Official material links](#official-material-links)
     - [Known issues](#known-issues)
     - [Assignment previews](#assignment-previews)
-        - [From an expert](#from-an-expert)
+        - [By prev author](#by-prev-author)
             - [A1P4: RiverSwim MDP](#a1p4-riverswim-mdp)
             - [A2P2: Policy Gradient Methods](#a2p2-policy-gradient-methods)
             - [A3P1-P3: Reward engineering, RLHF, DPO](#a3p1-p3-reward-engineering-rlhf-dpo)
-        - [From this author](#from-this-author)
+        - [By current author](#by-current-author)
             - [A1: RiverSwim](#a1-riverswim)
             - [A2: REINFORCE and PPO](#a2-reinforce-and-ppo)
             - [A3](#a3)
@@ -38,9 +38,7 @@ The *assignment_sub* folder in this repo contains personal attempts at solving t
 
 ## Official material links
 
-Also for spring 2024 offering.
-
-⚠️ These may expire without notice.
+Also for spring 2024 offering. These may expire without notice ⚠️.
 
 [Lecture videos](https://www.youtube.com/playlist?list=PLoROMvodv4rN4wG6Nk6sNpTEbuOSosZdX) |
 [Lecture materials](https://web.stanford.edu/class/cs234/CS234Spr2024/modules.html) |
@@ -64,9 +62,9 @@ For me (Python 3.13, setuptools 75.7.0, doing A2 in May 2025), changing it to gy
 
 ## Assignment previews
 
-### From an expert
+### By prev author
 
-These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at a top institution so these are probably very good references.
+These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at @gatech so these are probably very good references.
 
 #### A1_P4: RiverSwim MDP
 
@@ -84,9 +82,9 @@ These are preview of results produced by the original repo owner's work on these
 
 ---
 
-### From this author
+### By current author
 
-In case anyone wants more references.
+In case anyone wants to compare answers with more people. Again no guarantee on correctness.
 
 #### A1: RiverSwim
 
