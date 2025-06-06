@@ -8,6 +8,12 @@
   padding-left: 2em;
 }
 
+.answer img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 ol {
   list-style-type: lower-alpha;
 }

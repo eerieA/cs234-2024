@@ -270,7 +270,7 @@ Pendulum:
 Cheetah:
 <br>
 ![Plot for Cheetah environment](../a2_code/results/results-cheetah.png){#fig-plot-cheetah width=60%}.
-<br>
+<br><br>
 Below are some observations from reading the plots.
 <br>
 Cartpole and Pendulum:
@@ -408,11 +408,12 @@ $$
 because it equals to
 $$\begin{array}{rl}
   = & \gamma^{t+1}V^{\pi'}(s_{t+1}) - V^{\pi'}(s_0) \\
-\to & - V^{\pi'}(s_0) \quad \text{as } t \to \infty.
+\to & - V^{\pi'}(s_0) \quad \text{as } t \to \infty,
 \end{array}
 $$
-<br>
-So we can add the term $(1)$ and subtract $- V^{\pi'}(s_0)$ from $V^\pi(s_0)$:
+where the limit is evaluated considering $\gamma^{t+1}$ with $\gamma < 1$ will dominate.
+<br><br>
+Now we can add the term $(1)$ and subtract $- V^{\pi'}(s_0)$ from $V^\pi(s_0)$:
 $$
 \begin{array}{rl}
 & V^\pi(s_0) = \mathbb{E}_{\tau \sim \rho^\pi} \left[ \sum_{t=0}^\infty \left( \gamma^t\mathcal{R}(s_t, a_t) + \gamma^{t+1} V^{\pi'}(s_{t+1}) - \gamma^{t} V^{\pi'}(s_t) \right) \right] - (- V^{\pi'}(s_0)) \\
