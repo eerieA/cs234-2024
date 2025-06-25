@@ -64,7 +64,7 @@ For me (Python 3.13, setuptools 75.7.0, doing A2 in May 2025), changing it to gy
 
 ### By prev author
 
-These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD at @gatech so these are probably very good references.
+These are preview of results produced by the original repo owner's work on these assignments. Said owner seems to be a PhD who studied [@gatech](https://github.com/gatech) so these are probably very good references.
 
 #### A1_P4: RiverSwim MDP
 
