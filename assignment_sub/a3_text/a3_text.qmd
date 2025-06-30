@@ -1,0 +1,57 @@
+---
+title: "A3"
+bibliography: references.bib
+execute:
+  enabled: true
+  cache: true
+format:
+  html: 
+    css: styles.css
+    number-sections: true
+    embed-resources: true
+---
+
+$$
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+$$
+
+An introduction to reinforcement learning from human preferences
+
+The goal of this assignment is to give you some hands-on experience with reinforcement learning from human preferences (RLHF). You will implement, compare, and contrast several different approaches for a robotics task in MuJoCo.
+
+## Reward engineering (6 pts writeup + 7 pts coding)
+
+In Assignment 2 you applied PPO to solve an environment with a provided reward function. The process of deriving a reward function for a specific task is called reward engineering.
+
+### Written Questions (6 pts)
+
+1. **(2 pts)** (**written**) Why is reward engineering usually hard? What are potential risks that come with specifying an incorrect reward function? Provide an example of a problem and a reward function that appears to be adequate but may have unintended consequences.
+2. **(2 pts)** (**written**) Read the description of the [Hopper environment](https://gymnasium.farama.org/environments/mujoco/hopper/). Using your own words, describe the goal of the environment, and how each term of the reward functions contributes to encourage the agent to achieve it. (\textbf{Optional:} Do you agree with this reward function? Would you change it? How?)
+3. **(2 pts)** (**written**) By default, the episode terminates when the agent leaves the set of ''healthy'' states. What do these ''healthy'' states mean? Name one advantage and one disadvantage of this early termination.
+
+::: {.answer}
+1. Reward engineering is difficult because, reward functions are approximations of our true goals, and translating complex goals into a precise numerical reward signal is non-trivial and error-prone.
+<br>
+Mistakes in specification can lead to unintended behaviors, of which a common one is "reward hacking," where the agent exploits loopholes in the reward to maximize it without achieving human engineers real goal.
+<br>
+For example, if a clearning robot's reward is based on the number of dirt spots cleaned, it might scatter dirt to gain more reward instead of cleaning effectively. We have also seen an example in A1 about a traffic optimization agent.
+
+2. The goal is for the agent to control a 2D one-legged robot to "hop" (because it is only a leg) forward as far and as fast as possible without falling.
+<br>
+The reward function has three terms:
+  <ul>
+  <li>a forward velocity reward encouraging the agent to move forward (right).</li>
+  <li>a healthy state bonus rewarding balance and preventing falls.</li>
+  <li>a control cost penalizing large or abrupt actions to promote smooth and efficient movement.</li>
+  </ul>
+This combination encourages fast, stable hopping with realistic joint control.
+<br>
+I think I agree with this reward function, it accounts for most parts of the real goal, and it seems robust enough. I would maybe add another penalty that says the energy usage (battery etc.) cannot be too large, by using a `Σ|torque * angular_velocity|`. It may complicate learning or turns out to be not actually effective though.
+
+3. "Healthy" states are those where the robot's joint angles, velocities, and torso position remain within bounds. These are possibly arbitrarily set ranges to mimic human bodily balances, and thus helping maintain upright and balanced localmotions.
+<br>
+One advantage I can think of is such early termination encourages the agent to maintain stability and avoid catastrophic failure. It makes learning more efficient by resetting poor trajectories early.
+<br>
+One disadvantage might be, it can be overly conservative by cutting episodes short when recovery might still be possible, potentially limiting learning of recovery behaviors.
+:::
