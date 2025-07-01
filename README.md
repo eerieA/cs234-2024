@@ -46,9 +46,10 @@ Also for spring 2024 offering. These may expire without notice ⚠️.
 
 ## Known issues
 
-- For A2, the `gym==0.21` in the original requirements.txt may fail the installing because that version is not compatible with some newer setuptools ([../gym/issues/3176](https://github.com/openai/gym/issues/3176)). And even though there is setuptools==65.5.0 in the txt, pip creates an isolated temporary environment to build gym where the setuptools is of another version.  
+- For **A2**, the `gym==0.21` in the original requirements.txt may fail the installing because that version is not compatible with some newer setuptools ([../gym/issues/3176](https://github.com/openai/gym/issues/3176)). And even though there is setuptools==65.5.0 in the txt, pip creates an isolated temporary environment to build gym where the setuptools is of another version.  
 For me (Python 3.13, setuptools 75.7.0, doing A2 in May 2025), changing it to gym>=0.21,<0.27 worked, but this will install gym 0.26.2 which requires changing some of the template code. So a safer way is to use older Python like `Python 3.11` and just use gym 0.21.
-- In A2, running the `plot.py` for Cheetah environment, if seed is not a comma seperated string,  like this:
+
+- In **A2**, running the `plot.py` for Cheetah environment, if seed is not a comma seperated string,  like this:
     ```
     python code\plot.py --env-name cheetah --seeds 1
     ```
@@ -59,6 +60,18 @@ For me (Python 3.13, setuptools 75.7.0, doing A2 in May 2025), changing it to gy
     ```
     This might be due to how the plot.py reads data? But despite the error, it seems the plot can still be correctly reflecting the data. So we can likely ignore this.  
     Or, if you have time, run all three methods with Cheetah for another seed number, and run plot.py again with 2 seed numbers, the error will disappear.
+
+- For **A3**, if your device only has Windows, then the starter code will not work because it uses **mujoco-py**, which does not support Windows. (Even though Mujoco 2.1.0 itself does have windows-x86_64 release.)  
+So some alternatives are:
+
+    - Run a container such as a Docker container. This is what I used. Here is a screenshot of how much resources running a PPO for Hopper V3 costs on my machine.  
+            <img alt="A3 docker container resource estimate" src="./assignment_sub/previews/fig-a3-docker-resource.jpg" width="350px">
+    
+      My host machine CPU was AMD Ryzen 9 7900. My docker files are in `./assignment_sub/a3_docker` if you want a template. At the time it was Docker Engine 28.2.2, Docker Desktop 4.42.1.
+
+    - Rent a cheap VPS with about 2 vCPU and 4 GB memory. One with 1 vCPU and 2 GB memory might work too but expect longer running time per task probably.
+
+    - Use WSL. Theoretically should work too but I did not try it.
 
 ## Assignment previews
 
