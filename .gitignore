@@ -16,3 +16,6 @@ log*
 assignment_sub/*/results/*-baseline*/
 assignment_sub/*/results/*-no_baseline*/
 assignment_sub/*/results/*-ppo*/
+
+# A3 dependencies, actually just Mujoco binaries
+.mujoco/

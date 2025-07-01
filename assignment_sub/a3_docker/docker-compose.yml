@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  mujoco:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mujoco-container
+    volumes:
+      - ../a3_code:/workspace
+      - ../.mujoco:/root/.mujoco
+    working_dir: /workspace
+    stdin_open: true
+    tty: true

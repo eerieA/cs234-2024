@@ -1,0 +1,11 @@
+cython<3
+gym==0.17.2
+stable-baselines3==2.3.0
+shimmy>=0.2.1
+mujoco-py<2.2,>=2.1
+moviepy
+numpy
+torch
+matplotlib
+scipy
+tqdm
