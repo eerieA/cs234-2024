@@ -174,3 +174,119 @@ This is rendered video of the trained policy with seed `22`, with early terminat
   <br>
 Compared with the rollouts of policy with seed 11, the rollouts of policy with seed 22 are not very different. I like rollouts of policy with seed 22 a bit more, because from the video of rollout with early termination, the motions it produces looks a bit more stable near the end of the training: slightly less global vertical bouncing, and traveled a bit further with seemingly smoother control.
 :::
+
+## Learning from preferences (5 pts writeup + 25 pts coding)
+
+In the previous part you trained multiple policies from scratch and compared them at the end of training. In this section, we will see how we can use human preferences on two roll-outs to learn a reward function.
+
+We will follow the framework proposed by [@christiano_deep_2017]. A reward function $r: \mathcal{O} \times \mathcal{A} \rightarrow \mathbb{R}$ defines a preference relation $\succ$ if for all trajectories $\sigma^i = (o^i_t,a^i_t)_{t=0,...,T}$ we have that
+
+$$
+\left(\left(o_0^1, a_0^1\right), \ldots,\left(o_{T}^1, a_{T}^1\right)\right) \succ\left(\left(o_0^2, a_0^2\right), \ldots,\left(o_{T}^2, a_{T}^2\right)\right)
+$$
+
+whenever
+
+$$
+r\left(o_0^1, a_0^1\right)+\cdots+r\left(o_{T}^1, a_{T}^1\right)>r\left(o_0^2, a_0^2\right)+\cdots+r\left(o_{T}^2, a_{T}^2\right) .
+$$
+
+Following the Bradley-Terry preference model [@bradley_rank_1952], we can calculate the probability of one trajectory $\sigma^1$ being preferred over $\sigma^2$ as follows:
+
+$$
+\hat{P}\left[\sigma^1 \succ \sigma^2\right]=\frac{\exp \sum \hat{r}\left(o_t^1, a_t^1\right)}{\exp \sum \hat{r}\left(o_t^1, a_t^1\right)+\exp \sum \hat{r}\left(o_t^2, a_t^2\right)},
+$$
+
+where $\hat{r}$ is an estimate of the reward for a state-action pair. This is similar to a classification problem, and we can fit a function approximator to $\hat{r}$ by minimizing the cross-entropy loss between the values predicted with the above formula and ground truth human preference labels $\mu(1)$ and $\mu(2)$:
+
+$$
+\operatorname{loss}(\hat{r})=-\sum_{\left(\sigma^1, \sigma^2, \mu\right) \in \mathcal{D}} \mu(1) \log \hat{P}\left[\sigma^1 \succ \sigma^2\right]+\mu(2) \log \hat{P}\left[\sigma^2 \succ \sigma^1\right] .
+$$
+
+Once we have learned the reward function<span style="vertical-align: super; font-size: smaller;">*</span>, we can apply any policy optimization algorithm (such as PPO) to maximize the returns of a model under it.
+
+::: {.callout-note}
+**\*** Recent work on RLHF for reinforcement learning suggests that the pairwise feedback provided by humans on partial trajectories may be more consistent with regret, and that the learned reward function may be better viewed as an advantage function. See Knox et al. AAAI 2024 *"Learning optimal advantage from preferences and mistaking it for reward."* [https://openreview.net/forum?id=euZXhbTmQ7](https://openreview.net/forum?id=euZXhbTmQ7)
+:::
+
+### Written questions (5 pts)
+
+1. (5 pt) Let $\hat{r}(o,\ a) = \phi_w(o,\ a)$. Calculate $\nabla_w \operatorname{loss}(\hat{r}(o,\ a))$.
+
+::: {.answer}
+1. For convenience, denote:
+$$R_1 = \sum_t \phi_w(o_t^1, a_t^1), \quad R_2 = \sum_t \phi_w(o_t^2, a_t^2).$$
+So:
+$$
+\hat{P}[\sigma^1 > \sigma^2] = \frac{e^{R_1}}{e^{R_1} + e^{R_2}}, \quad \hat{P}[\sigma^2 > \sigma^1] = \frac{e^{R_2}}{e^{R_1} + e^{R_2}}.
+$$
+The gradient of a sum is the sum of gradients. So we can look at the loss for a single pair $(\sigma^1, \sigma^2, \mu)$:
+$$
+\ell(w) = -\mu(1) \log \left( \frac{e^{R_1}}{e^{R_1} + e^{R_2}} \right) - \mu(2) \log \left( \frac{e^{R_2}}{e^{R_1} + e^{R_2}} \right).
+$$
+Apply log rules:
+$$
+\ell(w) = -\mu(1)(R_1 - \log(e^{R_1} + e^{R_2})) - \mu(2)(R_2 - \log(e^{R_1} + e^{R_2})).
+$$
+Group terms:
+$$
+\ell(w) = -\mu(1) R_1 - \mu(2) R_2 + (\mu(1) + \mu(2)) \log(e^{R_1} + e^{R_2}).
+$$
+Now differentiate w.r.t. $w$:
+$$
+\nabla_w \ell(w) = -\mu(1) \nabla_w R_1 - \mu(2) \nabla_w R_2 + (\mu(1) + \mu(2)) \nabla_w \log(e^{R_1} + e^{R_2}). \tag{1}
+$$
+Recall:
+$$
+\nabla_w \log(e^{R_1} + e^{R_2}) = \frac{e^{R_1} \nabla_w R_1 + e^{R_2} \nabla_w R_2}{e^{R_1} + e^{R_2}} = \hat{P}[\sigma^1 > \sigma^2] \nabla_w R_1 + \hat{P}[\sigma^2 > \sigma^1] \nabla_w R_2
+$$
+, and plug it into $(1)$:
+$$
+\nabla_w \ell(w) = -\mu(1) \nabla_w R_1 - \mu(2) \nabla_w R_2 + (\mu(1) + \mu(2)) \left( \hat{P}[\sigma^1 > \sigma^2] \nabla_w R_1 + \hat{P}[\sigma^2 > \sigma^1] \nabla_w R_2 \right).
+$$
+Factor terms:
+$$
+\nabla_w \ell(w) = \left(-\mu(1) + (\mu(1) + \mu(2))\hat{P}[\sigma^1 > \sigma^2]\right) \nabla_w R_1 + \left(-\mu(2) + (\mu(1) + \mu(2))\hat{P}[\sigma^2 > \sigma^1]\right) \nabla_w R_2.
+$$
+By using the fact that
+$$\mu(1) + \mu(2) = 1$$
+, it can be further simplified as:
+$$
+\nabla_w \text{loss}(\hat{r}) = \sum_{(\sigma^1, \sigma^2, \mu) \in D} \left( (\hat{P}[\sigma^1 > \sigma^2] - \mu(1)) \nabla_w R_1 + (\hat{P}[\sigma^2 > \sigma^1] - \mu(2)) \nabla_w R_2 \right).
+$$
+:::
+
+### Coding questions (25 pts)
+
+In this problem we are trying to solve the same task as in the previous part, but this time we will learn a reward function from a dataset of preferences rather than manually specifying a reward function.
+
+2. (5 pt) Load one of the samples from the preference dataset we provide you, and render a video of the two trajectories using the following command
+
+    ```bash
+    python render.py --dataset [PATH TO PREFERENCE DATASET FILE] --idx IDX
+    ```
+
+    where `IDX` is an index into the preference dataset (if ommitted a sequence will be chosen at random). Bear in mind that each sequence in the dataset has 25 timesteps, which means that the resulting videos will have 0.2 seconds. Take note of which sequence was labeled as preferred (this information will appear in the name of the generated videos, but for the coming parts it is helpful to know that $0$ means the first sequence was preferred, $1$ means the second one, and $0.5$ means neither is preferred over the other). Do you agree with the label (that is, if shown the two trajectories, would you have ranked them the same way they appear in the dataset, knowing that we are trying to solve the Hopper environment)?
+
+3. (3 pt) Repeat the previous question for 4 more samples, keeping track of whether you personally agree with the dataset preference label. Use this to estimate how much you agree with whoever ranked the trajectories. How much did you get? Based on this agreement estimate, would you trust a reward function learned on this data?
+
+4. (8 pt) Implement the functions in the `RewardModel` class (`run_rlhf.py`), which is responsible for learning a reward function from preference data.
+
+5. (5 pt) Train a model using PPO and the learned reward function with 3 different random seeds. Plot the average returns for both the original reward function and the learned reward function and include it in your response.
+
+    ```bash
+    python plot.py --rlhf-directory results_rlhf --output \
+          results_rlhf/hopper_rlhf.png
+    ```
+
+    Do the two correlate?
+
+6. (1 pt) Is the learned reward function identifiable?
+
+7. (3 pt) Pick one of the policies and render a video of the agent behavior at the end of training.
+
+    ```bash
+    python render.py --checkpoint [PATH TO MODEL CHECKPOINT]
+    ```
+
+    How does it compare to the behavior of the agent generated by policies trained from scratch? How does it compare to the demonstrations you've seen from the dataset?
