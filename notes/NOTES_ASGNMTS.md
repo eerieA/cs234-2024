@@ -17,6 +17,9 @@
         - [Diagonal Gaussian](#diagonal-gaussian)
             - [Example](#example)
         - [Simple example for REINFORCE with b(s)](#simple-example-for-reinforce-with-bs)
+- [A3](#a3)
+    - [Q2](#q2)
+        - [2.1 Derivation of gradient of loss function](#21-derivation-of-gradient-of-loss-function)
 
 <!-- /TOC -->
 
@@ -380,3 +383,13 @@ mse = np.mean((returns - baseline_preds)**2)
 ```
 
 This loss is used in update_baseline() to improve the value predictions.
+
+# A3
+
+## Q2
+
+### 2.1 Derivation of gradient of loss function
+
+<img alt="A3 docker container resource estimate" src="./a3_01.jpg" width="65%">
+
+<img alt="A3 docker container resource estimate" src="./a3_02.jpg" width="65%">
