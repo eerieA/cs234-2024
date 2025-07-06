@@ -8,8 +8,8 @@
     - [Maximum likelihood](#maximum-likelihood)
     - [Max entropy principle in information theory](#max-entropy-principle-in-information-theory)
 - [Lecture 13](#lecture-13)
-    - [On conjugate distribs, bound error $V{max}$ and Contextual Multi-armed Bandits](#on-conjugate-distribs-bound-error-vmax-and-contextual-multi-armed-bandits)
-    - [Simulation lemma bound error derivation, $\Delta$ and the sums](#simulation-lemma-bound-error-derivation-\delta-and-the-sums)
+    - [On conjugate distribs, bound error Vmax and Contextual Multi-armed Bandits](#on-conjugate-distribs-bound-error-vmax-and-contextual-multi-armed-bandits)
+    - [Simulation lemma bound error derivation, Δ and the sums](#simulation-lemma-bound-error-derivation-δ-and-the-sums)
 
 <!-- /TOC -->
 
@@ -54,7 +54,7 @@ This arised from 3 properties of such a representation function $H$:
 2. If all the $p_i$ are equal, $pi = frac{1}{n}$, then $H$ should be a monotonic increasing function of n.
 3. If a choice be broken down into two successive choices, the original $H$ should be the weighted sum of the individual values of $H$.
 
-See the [original paper](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf) for details. Also there is a nice simple example with a 3 value variable in [arxiv.org/pdf/1405.2061](https://arxiv.org/pdf/1405.2061).
+See the [original paper](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf) for details. Also there is a nice simple example with a 3 value variable in [arxiv.org/pdf/1405.2061](https://arxiv.org/pdf/1405.2061), and a simple dice example in [...ece587/Lecture11.pdf](https://www2.isye.gatech.edu/~yxie77/ece587/Lecture11.pdf).
 
 Following this, there is:
 <div style="margin-left: 2em; margin-top: -1em; margin-bottom: 1em;">
@@ -68,7 +68,7 @@ In RL, we can use this principle and choose a max entropy reward function, so th
 
 # Lecture 13
 
-## On conjugate distribs, bound error $V_{max}$ and Contextual Multi-armed Bandits
+## On conjugate distribs, bound error Vmax and Contextual Multi-armed Bandits
 
 - Conjugate distributions example
 - Simulation lemma, bound error derivation, why is $V^{\pi}(s) \le R_{max} \cdot \frac{1}{1-\gamma}$
@@ -77,7 +77,7 @@ In RL, we can use this principle and choose a max entropy reward function, so th
 <img alt="Lecture 13 notes part 1" src="./CS234_7.jpg" width="80%">
 <img alt="Lecture 13 notes part 2" src="./CS234_8.jpg" width="80%">
 
-## Simulation lemma bound error derivation, $\Delta$ and the sums
+## Simulation lemma bound error derivation, Δ and the sums
 
 The derivation is:
 
