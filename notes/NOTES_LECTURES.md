@@ -6,6 +6,7 @@
     - [Example 1 $\epsilon$ -greedy policy improvement](#example-1-\epsilon--greedy-policy-improvement)
 - [Lecture 8 minor prereq knowledge](#lecture-8-minor-prereq-knowledge)
     - [Maximum likelihood](#maximum-likelihood)
+    - [Max entropy principle in information theory](#max-entropy-principle-in-information-theory)
 - [Lecture 13](#lecture-13)
     - [On conjugate distribs, bound error $V{max}$ and Contextual Multi-armed Bandits](#on-conjugate-distribs-bound-error-vmax-and-contextual-multi-armed-bandits)
     - [Simulation lemma bound error derivation, $\Delta$ and the sums](#simulation-lemma-bound-error-derivation-\delta-and-the-sums)
@@ -39,6 +40,31 @@ The start is on the previous page.
 The youtube link mentioned here is https://www.youtube.com/watch?v=myeAGFTKYkY .
 
 <img alt="Lecture 8 minor prereq knowledge" src="./CS234_6.jpeg" width="80%">
+
+## Max entropy principle in information theory
+
+The expert data (assumed to be optimal) may correspond to many optimal reward functions. We want the reward functions to induce probability distributions of trajectories that match the expert demonstrations.
+
+But why do we want to choose the max entropy one? This comes from the Maximum Entropy Principle in information theory, which uses the Shannon Entropy to represent uncertainty.
+
+$$E = H ( p_1, p_2, ..., p_n) = - \sum_i p_i log p_i.$$
+
+This arised from 3 properties of such a representation function $H$:
+1. $H$ should be continuous in the $p_i$.
+2. If all the $p_i$ are equal, $pi = frac{1}{n}$, then $H$ should be a monotonic increasing function of n.
+3. If a choice be broken down into two successive choices, the original $H$ should be the weighted sum of the individual values of $H$.
+
+See the [original paper](https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf) for details. Also there is a nice simple example with a 3 value variable in [arxiv.org/pdf/1405.2061](https://arxiv.org/pdf/1405.2061).
+
+Following this, there is:
+<div style="margin-left: 2em; margin-top: -1em; margin-bottom: 1em;">
+The <b>Principle of Maximum Entropy</b> is based on the premise that when estimating the probability distribution, you should select that distribution which leaves you the largest remaining uncertainty (i.e., the maximum entropy) consistent with your constraints (<a href="https://mtlsites.mit.edu/Courses/6.050/2003/notes/chapter10.pdf" target="_blank">Chapter 10 of some course in MIT</a>).
+</div>
+
+In RL, we can use this principle and choose a max entropy reward function, so that it induces a trajectory distribution that:
+
+- Explains the observed expert behavior.
+- While being as uncertain as possible about the parts of the environment the expert didn’t visit.
 
 # Lecture 13
 
