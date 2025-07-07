@@ -91,7 +91,7 @@ These are preview of results produced by the original repo owner's work on these
 
 | PPO (without early termination)  | PPO(with early termination) | RLHF |
 | ----------- | ----------- | ----------- |
-| <img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="80%"> | <img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="80%"> | <img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="100%"> |
+| <img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="220"> | <img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="220"> | <img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="220"> |
 
 ---
 
@@ -123,7 +123,7 @@ For brevity, only showing comparison of rollouts with one of the 3 seeds (seed 2
 
 | PPO (without early termination)  | PPO(with early termination) | RLHF |
 | ----------- | ----------- | ----------- |
-| <img alt="A3 problem 1 to 3 demo 1" src="./assignment_sub/previews/a3_q2_no_early_termination.gif" width="100%"> | <img alt="A3 problem 1 to 3 demo 2" src="./assignment_sub/previews/a3_q2_early_termination.gif" width="100%"> | <img alt="A3 problem 1 to 3 demo 3" src="./assignment_sub/previews/a3_q2_rlhf.gif" width="100%"> |
+| <img alt="A3 q2 PPO no early termination" src="./assignment_sub/previews/a3_q2_no_early_termination.gif" width="220"> | <img alt="A3 q2 PPO with early termination" src="./assignment_sub/previews/a3_q2_early_termination.gif" width="220"> | <img alt="A3 q2 RLHF" src="./assignment_sub/previews/a3_q2_rlhf.gif" width="220"> |
 
 Worth noting that with RLHF, the leg in the rollout looks more "upright" and "humanly", and hops for longer distance before falling. 
 
