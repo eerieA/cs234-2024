@@ -309,4 +309,69 @@ In this problem we are trying to solve the same task as in the previous part, bu
     | 6851   | 0.0 1st preferred     | 1st preferred     | yes |
 
     Based on this agreement estimate, I think I could reasonably trust a reward function learned on this data.
+4. All of `__init__()`, `forward()`, `compute_reward()`, and `update()` have been implemented.
+5. I used these commands to run the $RLHF$ procedure
+
+    ```bash
+    python run_rlhf.py --seed [SEED]
+    ```
+
+    for three different seeds `11`, `22` and `33`, to be consistent with previous work. Other command line arguments like
+
+    ```bash
+    --env-name
+    --dataset-path
+    --reward-min
+    --reward-max
+    --reward-model-hidden-dim
+    --reward-model-steps
+    --reward-model-batch-size
+    --rl-steps
+    --eval-period
+    --num-eval-episodes
+    ```
+
+    are not inputted because the defaults are good engough.
+    
+    Using command
+    
+    ```bash
+    python plot.py --rlhf-directory results_rlhf --output results_rlhf/hopper_rlhf.png --seeds 11,22,33
+    ```
+
+    , below is the plotted aggregated graph of the 6 curves put together.
+    ![Plot of RLHF learned and original returns](../a3_code/results_rlhf/hopper_rlhf.png){#fig-rlhf-vs-original width=60%}
+
+    **Correlation**
+
+    I observe pretty strong correlation. Across all three seeds, the average learned return and average original return:
+    - Increase at the same training steps.
+    - Plateau around the same time.
+    - Fluctuate in sync during the plateau phase.
+
+    It may worth noting that the learned return appears like a “vertically compressed” version of the original return. This is likely the effect of the $RLHF$ rewards being scaled.
+
+    This indicates that:
+    - The reward model captures the relative quality of behaviors well, since trends in learned return correlate with trends in true return.
+    - The reward model does not quite match the scale or exact values of the environment’s reward function, which is expected, since it was trained only on pairwise preferences, with a scaled-down (remapped into range [self.r_min, self.r_max]) proxy of the real reward. But the trend preservation tells us it is a good proxy.
+6. No, the learned reward function is not identifiable because multiple reward functions, e.g. differing by positive scaling or translation, can explain the same human preferences.
+7. I actually rendered videos for all three seeds using commands:
+
+    ```bash
+    python render.py --checkpoint results_rlhf/Hopper-v3-rlhf-seed=[SEED]/model.zip
+    ```
+
+    and visually compared them with videos for policies trained from scratch using the true Hopper reward (done for problem 1.2), who used the same set of seeds.
+
+    Here is the video for seed `22` as an example.
+    <br>
+    <video controls width="320">
+    <source src="../a3_code/results_rlhf/Hopper-v3-rlhf-seed=22/video.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+    </video>
+    <br>
+    
+    **Comparison**
+    - Compared to PPO agents trained from scratch, the RLHF-trained agents exhibited more natural and stable behavior. Their legs remained upright (rather than dragging or crawling), and the agent covered greater distances with smoother hops.
+    - These traits were more aligned with the human demonstrations seen in the dataset, suggesting that the learned reward better captures human-preferred locomotion than the environment's native reward function does.
 :::

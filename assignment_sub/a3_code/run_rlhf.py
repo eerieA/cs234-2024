@@ -48,6 +48,14 @@ class RewardModel(nn.Module):
         #######################################################
         #########   YOUR CODE HERE - 2-10 lines.   ############
 
+        self.rwd_net = nn.Sequential(
+            nn.Linear(obs_dim + action_dim, hidden_dim),
+            nn.LeakyReLU(),
+            nn.Linear(hidden_dim,1),
+            nn.Sigmoid()    # map previous layer outout into the interval [0, 1]
+        )
+        self.optimizer = torch.optim.AdamW(self.parameters())
+
         #######################################################
         #########          END YOUR CODE.          ############
         self.r_min = r_min
@@ -87,6 +95,10 @@ class RewardModel(nn.Module):
         #######################################################
         #########   YOUR CODE HERE - 2-3 lines.   ############
 
+        rwd_net_input = torch.cat([obs, action], dim=-1)
+        raw_rwds = self.rwd_net(rwd_net_input).squeeze(-1)
+        rewards = self.r_min + (self.r_max - self.r_min) * raw_rwds # need to remap into [r_min, r_max] range
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -118,6 +130,15 @@ class RewardModel(nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 1-4 lines.   ############
+        device = next(self.parameters()).device
+
+        # The input obs and action is one "element" each, but the self.forward()
+        # expects batches for both obs-es and actions, so we unsqueeze to make them fit
+        obs_tensor = np2torch(obs[None, :]).to(device)
+        act_tensor = np2torch(action[None, :]).to(device)
+        with torch.no_grad():
+            rwd_tensor = self.forward(obs_tensor, act_tensor)   # Use forward() to predict the rewards
+        return rwd_tensor.item()    # one obs and action pair gives one reward value
 
         #######################################################
         #########          END YOUR CODE.          ############
@@ -138,11 +159,28 @@ class RewardModel(nn.Module):
         Hint 1: https://pytorch.org/docs/stable/generated/torch.nn.functional.cross_entropy.html
         Hint 2: https://stackoverflow.com/questions/57161524/trying-to-understand-cross-entropy-loss-in-pytorch
         """
+        # obs1, obs2 has shape(B, T, obs_dim); act1, act2 has (B, T, act_dim);
+        # label is (B,) with values 0 or 1
         obs1, obs2, act1, act2, label = batch
 
         loss = torch.zeros(1)
         #######################################################
         #########   YOUR CODE HERE - 5-10 lines.   ############
+        """ We need to use the cross entropy loss in gradient step
+        loss = - \sum [ \mu(1)log P(b_i > b_j) + \mu(2)log P(b_j > b_i)]
+        so need to get the loss value evaluated through this expression (How?),
+        then feed that value to the optimizer. """
+        
+        # Calculate predicted (summed up) rewards with current obs and actions batches for
+        # both preference options. Each summed rewards will be of shape(B,)
+        r1 = self.forward(obs1, act1).sum(dim=1)
+        r2 = self.forward(obs2, act2).sum(dim=1)
+
+        # Compute cross entropy loss. The label is like the \mu, and the logits from the rewards is for
+        # the P(b_i > b_j) and P(b_j > b_i), because: P(b_i > b_j) = exp(r(b_i))/(exp(r(b_i)) + exp(r(b_j)))
+        # The cross_entropy() function does this internally. Neat!
+        logits = torch.stack([r1, r2], dim=1)
+        loss = F.cross_entropy(logits, label.long())
 
         #######################################################
         #########          END YOUR CODE.          ############
