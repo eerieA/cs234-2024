@@ -3,7 +3,7 @@
 - [Lecture 3](#lecture-3)
     - [Example 1 MC policy evaluation](#example-1-mc-policy-evaluation)
 - [Lecture 4](#lecture-4)
-    - [Example 1 $\epsilon$ -greedy policy improvement](#example-1-\epsilon--greedy-policy-improvement)
+    - [Example 1 ε-greedy policy improvement](#example-1-ε-greedy-policy-improvement)
 - [Lecture 8 minor prereq knowledge](#lecture-8-minor-prereq-knowledge)
     - [Maximum likelihood](#maximum-likelihood)
     - [Max entropy principle in information theory](#max-entropy-principle-in-information-theory)
@@ -24,7 +24,7 @@
 
 # Lecture 4
 
-## Example 1 $\epsilon$ -greedy policy improvement
+## Example 1 ε-greedy policy improvement
 
 The start is on the previous page.
 
