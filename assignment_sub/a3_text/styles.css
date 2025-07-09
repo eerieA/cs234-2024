@@ -29,6 +29,12 @@ ol {
   border-left: 1px dashed #0077b6;
 }
 
+.footnote-star {
+  vertical-align: super;
+  font-size: smaller;
+  color: blue;
+}
+
 /* Only on figcaption elements that are immediate children of figure elements */
 figure>figcaption.quarto-float-caption-bottom {
   text-align: center;

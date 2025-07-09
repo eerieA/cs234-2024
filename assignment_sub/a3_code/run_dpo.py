@@ -65,6 +65,16 @@ class ActionSequenceModel(nn.Module):
         #######################################################
         #########   YOUR CODE HERE - 3-9 lines.    ############
 
+        # The final output is mean and log-std, each needs to be of length segment_len*action_dim
+        # And the input should be from observations ([batch, obs_dim]), each obs has length obs_dim
+        self.net = nn.Sequential(
+            nn.Linear(obs_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, 2 * segment_len * action_dim),
+        )
+
+        self.optimizer = torch.optim.AdamW(self.parameters(), lr=lr)
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -106,6 +116,17 @@ class ActionSequenceModel(nn.Module):
         #######################################################
         #########   YOUR CODE HERE - 3-9 lines.    ############
 
+        mean_flat, log_std_flat = torch.split(net_out, net_out.shape[1] // 2, dim=1)
+
+        # Reshape them
+        mean = mean_flat.view(batch_size, self.segment_len, self.action_dim)
+        log_std = log_std_flat.view(batch_size, self.segment_len, self.action_dim)
+
+        # Apply tanh and clamping
+        mean = torch.tanh(mean)
+        log_std = torch.clamp(log_std, LOGSTD_MIN, LOGSTD_MAX)
+        std = torch.exp(log_std)
+
         #######################################################
         #########          END YOUR CODE.          ############
         return mean, std
@@ -135,6 +156,18 @@ class ActionSequenceModel(nn.Module):
         #######################################################
         #########   YOUR CODE HERE - 1-5 lines.    ############
 
+        """ So the obs is probably of shape [batch, obs_dim], then mean and std are both
+        of shape [batch_size, segment_len, action_dim] """
+        mean, std = self.forward(obs)
+        base_distribs = D.Normal(mean, std) # This stores a bunch of Gaussians corresponding to the batches
+
+        """ Wrap the scalar Normal distributions into a single multivariate distribution.
+        By default, D.Normal(mean, std) treats each scalar value as an independent random variable.
+        But we actually want to treat the full action sequence ([segment_len, action_dim]) as one multivariate sample.
+        So tell Independent() to "merge" the last 2 dims (segment_len, action_dim) to be interpreted as if a multivariate
+        thing from a joint distribution, while each element is still from independent Gaussians. """
+        return D.Independent(base_distribs, reinterpreted_batch_ndims=2)
+
         #######################################################
         #########          END YOUR CODE.          ############
 
@@ -158,6 +191,16 @@ class ActionSequenceModel(nn.Module):
         """
         #######################################################
         #########   YOUR CODE HERE - 2-6 lines.    ############
+
+        # Wrap single obs into a batch of 1, shape (1, obs_dim), and convert
+        # so that it is of correct shape for self.distribution()
+        obs_tensor = np2torch(obs[None, :])
+        distrib = self.distribution(obs=obs_tensor)
+        action_seq = distrib.sample()[0]    # This will be of shape [segemen_len, action_dim]
+
+        # Get only the first action, clamp it, detach from the computation graph,
+        # and turn into np.ndarray
+        return action_seq[0].clamp(-1,1).detach().numpy()
 
         #######################################################
         #########          END YOUR CODE.          ############
