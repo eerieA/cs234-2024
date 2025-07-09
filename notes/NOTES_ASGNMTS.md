@@ -20,6 +20,7 @@
 - [A3](#a3)
     - [Q2](#q2)
         - [2.1 Derivation of gradient of loss function](#21-derivation-of-gradient-of-loss-function)
+        - [3.1 Implementation of ActionSequenceModel](#31-implementation-of-actionsequencemodel)
 
 <!-- /TOC -->
 
@@ -393,3 +394,73 @@ This loss is used in update_baseline() to improve the value predictions.
 <img alt="A3 docker container resource estimate" src="./a3_01.jpg" width="65%">
 
 <img alt="A3 docker container resource estimate" src="./a3_02.jpg" width="65%">
+
+### 3.1 Implementation of ActionSequenceModel
+
+Just a note about how `D.Normal()` and `D.Independent()` contribute to the `self.distribution()`.
+```
+base_dist = D.Normal(mean, std)
+```
+The mean and std are both of shape [batch_size, segment_len, action_dim]. So this creates a Normal distribution for each element of mean and std, a batch of independent scalar Normal distributions (Gaussians), one for each scalar action dimension at each time step.
+
+```
+return D.Independent(base_dist, reinterpreted_batch_ndims=2)
+```
+We actually want to treat the full action sequence ([segment_len, action_dim]) as one multivariate sample. So tell Independent() to "merge" the last 2 dims (segment_len, action_dim) to be interpreted as if a multivariate thing from a joint distribution, while each element is still from independent Gaussians.
+
+**Example**
+
+Suppose we have a model that outputs a plan of 2 timesteps, each with 3 action dimensions (e.g., for a robot arm with 3 joints), so:
+- segment_len = 2
+- action_dim = 3.
+
+And let's say we have simple data:
+
+    # shape: (batch_size=1, segment_len=2, action_dim=3)
+    mean = torch.tensor([[[0.0, 1.0, 2.0],
+                        [3.0, 4.0, 5.0]]])  # shape (1, 2, 3)
+    std = torch.ones_like(mean)  # std dev = 1 everywhere
+
+. Then if we construct the Gaussians and sample it:
+```
+base_dist = D.Normal(mean, std)
+sample = base_dist.sample()  # shape: (1, 2, 3)
+print(sample)
+```
+
+, it would print something like
+
+```python
+tensor([[[ 0.2, 0.9, 1.8],
+         [ 2.7, 3.9, 5.1]]])
+```
+
+, with each of the 6 values being a draw from a separate Gaussian.
+
+Next if we do
+
+```
+dist = D.Independent(base_dist, reinterpreted_batch_ndims=2)
+```
+
+, it reinterprets the last 2 dimensions as a single vector-valued random variable.
+
+- Before: shape (1, 2, 3) = 6 independent scalars.
+- After: shape (1,), where each sample is a 6D vector from a joint distribution.
+
+And if we sample from this `dist`
+
+```
+sample = dist.sample()  # shape: (1, 2, 3)
+print(sample[0].flatten())
+```
+
+, the output would look like
+
+```python
+tensor([0.2, 0.9, 1.8, 2.7, 3.9, 5.1])
+```
+
+. The 6 numbers in this tensor are drawn independently from 6 normal distributions, but are grouped together into one multivariate sample. (It does not introduce correlation.)
+
+This makes nice sample shape for vectorized computation of actions, log-probs, losses, for training, evaluation, and batching in this Q3 (with DPO), which all need to align with the problem formulation and semantics.
