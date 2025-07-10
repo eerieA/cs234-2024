@@ -1,5 +1,5 @@
 import pathlib
-from typing import Tuple
+from typing import Tuple, Union
 
 import gym
 import numpy as np
@@ -226,6 +226,18 @@ class SFT(ActionSequenceModel):
         """
         #######################################################
         #########   YOUR CODE HERE - 4-6 lines.    ############
+        """ This is a subclass of ActionSequenceModel. So we need to construct a distribution
+        using self methods, then calculate log probs, then use the usual optimizer stuff
+        to minimize the negative expectation of log probs, = maxmize the positive one.
+        Bcz we want to maximize the log probability to match the preferred action sequences. """
+        distrib = self.distribution(obs=obs)
+        log_probs = distrib.log_prob(actions)
+        loss = -log_probs.mean()
+
+        # Usual optimizer stuff
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
         #######################################################
         #########          END YOUR CODE.          ############
@@ -250,7 +262,7 @@ class DPO(ActionSequenceModel):
         obs: torch.Tensor,
         actions_w: torch.Tensor,
         actions_l: torch.Tensor,
-        ref_policy: nn.Module,
+        ref_policy: Union[nn.Module, ActionSequenceModel],
     ):
         """Run one DPO update step
 
@@ -275,6 +287,27 @@ class DPO(ActionSequenceModel):
         """
         #######################################################
         #########   YOUR CODE HERE - 8-14 lines.   ############
+        """ The DPO loss is
+        -expectance( log (sigmoid (beta * (
+            (logπ_θ(y_w)−logπ_ref(y_w)) − (logπ_θ(y_l)−logπ_ref(y_l))
+            ) ) ) ) """
+        # These are for current policy, i.e. π_θ
+        distrib = self.distribution(obs=obs)
+        log_prob_w = distrib.log_prob(actions_w)    # match win action seq
+        log_prob_l = distrib.log_prob(actions_l)    # match lose action seq
+
+        with torch.no_grad():
+            distrib_ref = ref_policy.distribution(obs=obs)  # no need for grads since ref poli is fixed
+            log_prob_ref_w = distrib_ref.log_prob(actions_w)
+            log_prob_ref_l = distrib_ref.log_prob(actions_l)
+        
+        ratio_diff = self.beta * ((log_prob_w - log_prob_ref_w) - (log_prob_l - log_prob_ref_l))
+        loss = -F.logsigmoid(ratio_diff).mean()
+        
+        # Usual optimizer stuff
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
         #######################################################
         #########          END YOUR CODE.          ############

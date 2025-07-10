@@ -431,3 +431,75 @@ In a similar way, given an observation $x$ we could have two ranked sequences of
     :::
 
     How do they compare?
+
+::: {.answer}
+1. All of `__init__()`, `forward()`, `distribution()`, and `act()` have been implemented.
+2. Implemented.
+3. Implemented.
+4. Initially used these parameters:
+
+    ```bash
+    python run_dpo.py --seed 11 --num-dpo-steps 50000 --dpo-lr 3e-7 --eval-period 1000
+    python run_dpo.py --seed 22 --num-dpo-steps 50000 --dpo-lr 3e-7 --eval-period 1000
+    python run_dpo.py --seed 33 --num-dpo-steps 50000 --dpo-lr 3e-7 --eval-period 1000
+    ```
+
+    , but the results of trainings with seeds 22 and 33 showed decreasing return after some time steps. So I did many tweaks such as:
+
+    - Different --num-dpo-steps values to find the roughly "optimal" number just before the returns started to decline.
+    - Different --dpo-lr values for the chosen seeds, and find a best one for each seed.
+    
+    Here are the parameters that were settled on:
+
+    ```bash
+    python run_dpo.py --seed 11 --num-dpo-steps 83000 --dpo-lr 3e-7 --eval-period 1000
+    python run_dpo.py --seed 22 --num-dpo-steps 83000 --dpo-lr 2e-7 --eval-period 1000
+    python run_dpo.py --seed 33 --num-dpo-steps 83000 --dpo-lr 3e-7 --eval-period 1000
+    ```
+
+    . The idea was to fix a good num-dpo-steps as much as possible, and then find a good dpo-lr that brings the best out of each subset of data under this num-dpo-steps value.
+    
+    Using the provided script
+
+    ```bash
+    python plot.py --dpo-directory results_dpo --output results_dpo/hopper_dpo.png --seeds 11,22,33
+    ```
+
+    , the following aggregated plot was made.
+    ![Plot of DPO returns](../a3_code/results_dpo/hopper_dpo.png){#fig-dpo-returns width=60%}
+    
+    **Observations**
+    - Speed: DPO gets up to good behavior far faster than RLHF.
+    - Final performance: DPO achieves higher mean returns on Hopper under the same horizon and evaluation protocol.
+    - Hyperparameter sensitivity: DPO required manual tuning (learning rate and number of training steps) to avoid collapse after the plateau.
+    
+    **Pros-cons comparison**
+
+    DPO pros
+
+    - Learns end-to-end directly from preference data; skips the two-stage reward model + PPO loop.
+    - Rapid improvement in early training.
+    - Higher final returns on this Hopper task (≈950 vs. 600), but may be due to reward-scale differences.
+
+    DPO cons
+
+    - Sensitive to hyperparameters (learning rate, number of steps).
+    - No explicit reward model means less interpretability of learned “reward.”
+    - May overfit preferences if not carefully regularized.
+
+    RLHF pros
+
+    - Modular: explicit reward model that you can inspect, visualize, or reuse.
+    - PPO adds robustness via environment interaction and on-policy exploration.
+    - More stable across seeds with default settings.
+
+    RLHF cons
+
+    - Slower: two phases (reward fitting + PPO) each require many steps.
+    - Lower returns in this Hopper problem (again may partly incorporating differences in reward scaling).
+5. Considering that both policies in each pair are stochastic, I rendered several for each. For example, under the folder with seed 11, 3 videos with model_sft.pt and 3 videos with model.pt were rendered and compared. Then the human mind tried to qualitatively catch differences in the trends.
+
+    DPO's improving effect may not be obvious at all in some of these. I observed that some datasets tend to result in SFT policies that produces worse rollouts, and some tend to result in better ones, so I suppose varied effects of DPO is not abnormal. Also the numerical rewards improvement was only about 350, which is indeed not that much.
+    
+    But in general, there is a trend of DPO fine-tuned policy rollouts exhibiting slightly more balanced gaits and slighty longer hopping distances.
+:::
