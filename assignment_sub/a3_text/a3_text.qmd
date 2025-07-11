@@ -495,11 +495,156 @@ In a similar way, given an observation $x$ we could have two ranked sequences of
 
     RLHF cons
 
-    - Slower: two phases (reward fitting + PPO) each require many steps.
+    - Slower: two phases, reward fitting + PPO, each require many steps.
     - Lower returns in this Hopper problem (again may partly incorporating differences in reward scaling).
 5. Considering that both policies in each pair are stochastic, I rendered several for each. For example, under the folder with seed 11, 3 videos with model_sft.pt and 3 videos with model.pt were rendered and compared. Then the human mind tried to qualitatively catch differences in the trends.
 
     DPO's improving effect may not be obvious at all in some of these. I observed that some datasets tend to result in SFT policies that produces worse rollouts, and some tend to result in better ones, so I suppose varied effects of DPO is not abnormal. Also the numerical rewards improvement was only about 350, which is indeed not that much.
     
     But in general, there is a trend of DPO fine-tuned policy rollouts exhibiting slightly more balanced gaits and slighty longer hopping distances.
+    
+    Addtionally, when compared with rollout videos with the RLHF policies in previous problems, RLHF seems to train better policies than DPO. This could be because the $\beta$ we use for DPO is pretty small here, and also as noted above, data quality affects DPO results. Besides, visual observations do not always reflect the whole situation: numerical rewards show us that DPO is better over all, with respect to the objectives we set.
+:::
+
+## Best Arm Identification in Multi-armed Bandit (25pts)
+
+In many experimental settings we are interested in quickly identifying the ``best" of a set of potential interventions, such as finding the best of a set of experimental drugs at treating cancer, or the website design that maximizes user subscriptions. Here we may be interested in efficient pure exploration, seeking to quickly identify the best arm for future use.
+
+In this problem, we bound how many samples may be needed to find the best or near-optimal intervention. We frame this as a multi-armed bandit with rewards bounded in $[0,1]$. Recall a bandit problem can be considered as a finite-horizon MDP with just one state ($|\mathcal{S}| = 1$) and horizon $1$: each episode consists of taking a single action and observing a reward. In the bandit setting -- unlike in standard RL -- the action (or ``arm") taken does not affect the distribution of future states. We assume a simple multi-armed bandit, meaning that $1 < |\mathcal{A}| < \infty$. Since there is only one state, a policy is simply a distribution over actions. There are exactly $|\mathcal{A}|$ different deterministic policies. Your goal is to design a simple algorithm to identify a near-optimal arm with high probability.
+
+We recall Hoeffding's inequality: if $X_1,\dots,X_n$ are i.i.d. random variables satisfying $0 \le X_i \le 1$ with probability $1$ for all $i$, $\overline X = \mathbb{E}[X_1] = \dots = \mathbb{E}[X_n]$ is the expected value of the random variables, and $\widehat X = \frac{1}{n} \sum_{i=1}^n X_i$ is the sample mean, then for any $\delta > 0$ we have
+\begin{align}
+\Pr\Bigg(|\widehat X - \overline X | > \sqrt{\frac{\log(2/\delta)}{2n}}	\Bigg) < \delta.
+\end{align}
+
+Assuming that the rewards are bounded in $[0,1]$, we propose this simple strategy: pull each arm $n_e$ times, and return the action with the highest average payout $\widehat r_a$. The purpose of this exercise is to study the number of samples required to output an arm that is at least $\epsilon$-optimal with high probability. Intuitively, as $n_e$ increases the empirical average of the payout $\widehat r_a$ converges to its expected value $\overline r_a$ for every action $a$, and so choosing the arm with the highest empirical payout $\widehat r_a$ corresponds to approximately choosing the arm with the highest expected payout $\overline r_a$.
+
+1.  (10 pts) We start by bounding the probability of the ``bad event'' in which the empirical mean of some arm differs significantly from its expected return. Starting from Hoeffding's inequality with $n_e$ samples allocated to every action, show that:
+    \begin{align}
+    \Pr\Bigg(\exists a \in \mathcal{A} \quad \text{s.t.} \quad |\widehat r_a - \overline r_a | > \sqrt{\frac{\log(2/\delta)}{2n_e}}	\Bigg) < |\mathcal{A}|\delta.
+    \end{align}
+    Note that, depending on your derivation, you may come up with a tighter upper bound than $|\mathcal{A}|\delta$. This is also acceptable (as long as you argue that your bound is tighter), but showing the inequality above is sufficient.
+
+2.  (15 pts) After pulling each arm (action) $n_e$ times our algorithm returns the arm with the highest empirical mean:
+    \begin{equation}
+    a^\dagger = \arg\max_{a} \widehat r_a
+    \end{equation}
+    Notice that $a^\dagger$ is a random variable. Let ${a^\star} = \arg\max_a \overline r_{a}$ be the true optimal arm. Suppose that we want our algorithm to return at least an $\epsilon$-optimal arm with probability at least $1-\delta'$, as follows:
+
+    $$
+    \Pr \Bigg(\overline r_{a^\dagger} \geq \overline r_{a^\star} - \epsilon \Bigg) \geq 1-\delta'
+    $$ {#eq-maxa}
+
+    How accurately do we need to estimate each arm in order to pick an arm that is $\epsilon$-optimal? Then derive how many total samples we need total (across all arms) to return an $\epsilon$-optimal arm with prob at least 1- $\delta'$ (that satisfies Equation @eq-maxa). Express your result as a function of the number of actions, the required precision $\epsilon$ and the failure probability $\delta'$.
+
+3.  (0 pts) (Optional challenge, will not be graded) The above derivation only assumed the outcomes were bounded between 0 and 1. In practice people often assume outcomes are drawn from a parametric distribution, and under mild assumptions, one can use the central limit theorem to assume the average outcomes for an arm will follow a normal distribution. Repeat the above analysis under this assumption, for a multi-armed bandit with two arms. Is the resulting number of samples significantly smaller under these assumptions? In real settings it is often very expensive to run experiments. Do you think the method and bound derived in (a)-(b) would be preferable to making a normal assumption and why or why not?
+
+::: {.answer}
+1. There seem to be several approaches that could show at least the required inequality, and a few of them involve advanced theorems. So I chose the most intuitive and simplest approach for myself:
+    - using independence and
+    - the $\Pr(\text{at least one of } event \; i \text{ happen}) = 1 - \Pr(\text{none of the } \overline{event \; i} \text{ happens})$ idea.
+
+    We observe that the samples for each arm are drawn independently of the samples for any other arm. This means the empirical means $\widehat r_a$ are independent random variables across different arms $a$. So the events $E_a = \{|\widehat r_a - \overline r_a | > t\}$ are independent events for different arms $a \in \mathcal{A}$.
+
+    Let $F_a$ be the complement event of $E_a$: $F_a = \{|\widehat r_a - \overline r_a | \leq t\}$.
+
+    The probability of $F_a$ is $\Pr(F_a) = 1 - \Pr(E_a)$. Since $\Pr(E_a) < \delta$, we have $\Pr(F_a) > 1 - \delta$.
+
+    The event $\mathcal{E}$ (at least one bad event $E_a$ occurs) is the complement of the event where *all* good events $F_a$ occur simultaneously.
+    
+    Define new event $\mathcal{F} = \bigcap_{a \in \mathcal{A}} F_a$.
+    Then $\mathcal{E} = \mathcal{F}^c$ (complementary), so    
+    $$\Pr(\mathcal{E}) = 1 - \Pr(\mathcal{F}) = 1 - \Pr\left(\bigcap_{a \in \mathcal{A}} F_a\right).$$
+
+    Using the fact that $\Pr(F_a) > 1-\delta$ for each arm:
+    $$ \Pr\left(\bigcap_{a \in \mathcal{A}} F_a\right) > \prod_{a \in \mathcal{A}} (1-\delta) = (1-\delta)^{|\mathcal{A}|} $$
+
+    , the probability of the bad event $\mathcal{E}$ is:
+    $$ \Pr(\mathcal{E}) = 1 - \Pr\left(\bigcap_{a \in \mathcal{A}} F_a\right) < 1 - (1-\delta)^{|\mathcal{A}|} $$
+
+    This provides a tighter upper bound:
+    $$ \Pr\Bigg(\exists a \in \mathcal{A} \quad \text{s.t.} \quad |\widehat r_a - \overline r_a | > \sqrt{\frac{\log(2/\delta)}{2n_e}}	\Bigg) < 1 - (1-\delta)^{|\mathcal{A}|} $$
+
+    **Why is $1 - (1-\delta)^{|\mathcal{A}|}$ tighter than $|\mathcal{A}|\delta$**
+
+    Using Bernoulli's inequality, $(1-\delta)^{|\mathcal{A}|} \geq 1 - |\mathcal{A}|\delta$ for $\delta \in [0,1]$ and integer $|\mathcal{A}| \geq 1$.
+
+    $$\Rightarrow -(1-\delta)^{|\mathcal{A}|} \leq |\mathcal{A}|\delta - 1$$
+    $$\Rightarrow 1 - (1-\delta)^{|\mathcal{A}|} \leq |\mathcal{A}|\delta.$$
+
+    The inequality is strict for $|\mathcal{A}| > 1$ and $\delta \in (0,1)$.
+
+    Thus, the bound $1 - (1-\delta)^{|\mathcal{A}|}$ derived using the independence of the arm samples is tighter than the bound $|\mathcal{A}|\delta$, unless $|\mathcal{A}|=1$ or $\delta=0,1$.
+2. According to the given algorithm, we choose
+    $$a^l = \arg \max_a \hat{r}_a, \quad a^* = \arg \max_a \bar{r}_a.$$
+
+    Now we want
+    $$\Pr(\bar{r}_{a^l} \geq \bar{r}_{a^*} - \epsilon) \geq 1 - \delta'.$$
+
+    A sufficient condition is that all empirical (sapmle) mean errors are bounded by $\epsilon/2$:
+    $$\forall a, \quad |\hat{r}_a - \bar{r}_a| \leq \frac{\epsilon}{2},$$
+
+    because then we will have:
+    $$|\hat{r}_{a^\dagger} - \bar{r}_{a^\dagger}| \leq \frac{\epsilon}{2}
+    \Longleftrightarrow -\frac{\epsilon}{2} \le \hat{r}_{a^\dagger} - \bar{r}_{a^\dagger} \le \frac{\epsilon}{2}
+    \Longrightarrow \bar{r}_{a^\dagger} \ge \hat{r}_{a^\dagger} - \frac{\epsilon}{2} \tag{1}
+    $$
+    $$|\hat{r}_{a^*} - \bar{r}_{a^*}| \leq \frac{\epsilon}{2}
+    \Longleftrightarrow -\frac{\epsilon}{2} \le \hat{r}_{a^*} - \bar{r}_{a^*} \le \frac{\epsilon}{2}
+    \Longrightarrow \bar{r}_{a^*} \ge \hat{r}_{a^*} - \frac{\epsilon}{2} \tag{2}
+    $$
+    $$ (1) \wedge (2) \Longrightarrow \bar{r}_{a^\dagger}\ge \hat{r}_{a^*} - \epsilon
+    $$
+
+    Now applying the result from (a), we get
+    $$\Pr\left(\exists a : |\hat{r}_a - \bar{r}_a| > \frac{\epsilon}{2}\right) \leq |A| \delta.$$
+
+    On the RHS we can let $|A| \delta = \delta'$:
+    $$\Pr\left(\exists a : |\hat{r}_a - \bar{r}_a| > \frac{\epsilon}{2}\right) \leq \delta'.$$
+    
+    Then we just need another sufficient requirement
+    $$\sqrt{\frac{\log(2(\delta'/|A|))}{2n_e}} \leq \frac{\epsilon}{2},$$
+    which gives us
+    $$n_e \geq \frac{2}{\epsilon^2} \log\left(\frac{2|A|}{\delta'}\right),
+    $$
+
+    for each arm.
+    
+    So total samples we need (across all arms) is at least $|A|n_e$, which is
+    $$\frac{2|A|}{\epsilon^2} \log\left(\frac{2|A|}{\delta'}\right).
+    $$
+:::
+
+## Challenges of RLHF (5 pts)
+
+RLHF and DPO leverage humans providing pairwise comparisons.
+
+1.  (2 pts) Who are human raters likely to be that are employed to provide pairwise preferences for generic LLM RLHF/DPO (in terms of socioeconomic profiles)? What ethical issues may this have, and what impact may this have on the resulting trained models?
+
+2.  (1 pt) Would RLHF be a good way to train a system to make better medical diagnoses? Why or why not?
+
+3.  (2 pts)There are a number of limitations of RLHF. Please describe one here (different than parts a and b). You may find it interesting to read ["Open Problems and Fundamental Limitations of Reinforcement Learning from Human Feedback"](https://arxiv.org/pdf/2307.15217) and you are welcome to describe challenges listed there, or make up your own.
+
+::: {.answer}
+1. Human raters for large-scale RLHF or DPO training on language models are often sourced from online platforms (like Mechanical Turk, Upwork, or specialized annotation companies). Typically they are adults from diverse but often underpaid gig economy workers or crowdworkers, sometimes from developing countries. They may have varying levels of education (from high school to some college) but rarely experts in the model's domain. This means the raters might be economically vulnerable, working for relatively low wages under potentially stressful or monotonous conditions.
+
+    Based on this, I think there are at least these ethical issues:
+
+    - Exploitation. Low pay and precarious working conditions raise fairness and labor rights concerns.
+    - Bias introduction. Raters’ cultural backgrounds, political views, and personal experiences influence their preferences, which can bias the model toward certain worldviews or values (e.g., Western-centric, politically biased).
+    - Lack of domain expertise. For specialized tasks (e.g., animation, legal), non-expert raters may produce misleading or suboptimal preferences.
+
+    First of all, suboptimal preferences will harm model quality. Secondly, the biases and limitations in raters’ profiles can propagate into the model, resulting in systems that reflect specific cultural or ideological viewpoints, which would be bad for generalization in deployment.
+2. One can argue both ways using similar set of reasoning points. From my perspective it is easier to argue against it. Here are my reasons.
+
+    - Medical diagnosis outcomes can be multi-faceted, uncertain, and context-dependent, making pairwise preferences hard to specify.
+    - RLHF models risk learning over-fitted correlations, which is dangerous in high-stakes medical contexts.
+    - If raters’ preferences reflect local practices or biases, models may not generalize well or could amplify disparities in care.
+3. After reading the paper, I would like to address the risk of reward hacking in RLHF.
+
+    Since the reward model is trained from imperfect human feedback, it may assign high scores to outputs that superficially look good according to the learned preferences but are actually undesirable (e.g., verbose, evasive, or even toxic responses). The policy can exploit these flaws, producing outputs that maximize reward yet fail to align with true human intent.
+
+    A recent example illustrating this broader failure mode is the July 2025 incident involving Grok, the chatbot developed by xAI. As [reported in CNN](https://www.cnn.com/2025/07/10/tech/grok-antisemitic-outbursts-reflect-a-problem-with-ai-chatbots), Grok produced several antisemitic outputs in public interactions. While the root cause is not publicly confirmed to be RLHF-related, the incident reflects a core risk: models can learn to game reward signals or mirror undesirable data distributions if the training process fails to account for edge cases or wholistic perspectives. It illustrates how reward hacking, or more broadly misalignment, can manifest in real-world deployments.
+
+    This cautions us that, even if models appear well-aligned in RLHF training scenarios, without robust generalization and safety mechanisms, they can behave unethically in deployment.
 :::

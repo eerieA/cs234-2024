@@ -1,7 +1,7 @@
 <!-- TOC -->
 
 - [A2](#a2)
-    - [Q2](#q2)
+    - [A2 Q2](#a2-q2)
         - [What Is a Neural Network](#what-is-a-neural-network)
             - [Example: Predicting Weather](#example-predicting-weather)
         - [What is backpropagation](#what-is-backpropagation)
@@ -18,15 +18,18 @@
             - [Example](#example)
         - [Simple example for REINFORCE with b(s)](#simple-example-for-reinforce-with-bs)
 - [A3](#a3)
-    - [Q2](#q2)
+    - [A3 Q2](#a3-q2)
         - [2.1 Derivation of gradient of loss function](#21-derivation-of-gradient-of-loss-function)
-        - [3.1 Implementation of ActionSequenceModel](#31-implementation-of-actionsequencemodel)
+    - [A3 Q3](#a3-q3)
+        - [3.1 ActionSequenceModel implementation notes](#31-actionsequencemodel-implementation-notes)
+    - [A3 Q4](#a3-q4)
+        - [4. b ϵ optimal arm total samples](#4-b-ϵ-optimal-arm-total-samples)
 
 <!-- /TOC -->
 
 # A2
 
-## Q2
+## A2 Q2
 
 ### What Is a Neural Network
 
@@ -387,7 +390,7 @@ This loss is used in update_baseline() to improve the value predictions.
 
 # A3
 
-## Q2
+## A3 Q2
 
 ### 2.1 Derivation of gradient of loss function
 
@@ -395,7 +398,9 @@ This loss is used in update_baseline() to improve the value predictions.
 
 <img alt="A3 docker container resource estimate" src="./a3_02.jpg" width="65%">
 
-### 3.1 Implementation of ActionSequenceModel
+## A3 Q3
+
+### 3.1 ActionSequenceModel implementation notes
 
 Just a note about how `D.Normal()` and `D.Independent()` contribute to the `self.distribution()`.
 ```
@@ -464,3 +469,9 @@ tensor([0.2, 0.9, 1.8, 2.7, 3.9, 5.1])
 . The 6 numbers in this tensor are drawn independently from 6 normal distributions, but are grouped together into one multivariate sample. (It does not introduce correlation.)
 
 This makes nice sample shape for vectorized computation of actions, log-probs, losses, for training, evaluation, and batching in this Q3 (with DPO), which all need to align with the problem formulation and semantics.
+
+## A3 Q4
+
+### 4.b ϵ optimal arm total samples
+
+<img alt="A3 docker container resource estimate" src="./a3_03.jpg" width="65%">
