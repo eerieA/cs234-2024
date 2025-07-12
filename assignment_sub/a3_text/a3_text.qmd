@@ -613,6 +613,66 @@ Assuming that the rewards are bounded in $[0,1]$, we propose this simple strateg
     So total samples we need (across all arms) is at least $|A|n_e$, which is
     $$\frac{2|A|}{\epsilon^2} \log\left(\frac{2|A|}{\delta'}\right).
     $$
+3. The central limit theorem (probability theory) states that, under appropriate conditions, the distribution of a normalized version of the sample mean converges to a standard normal distribution. Using this, we assume the 2 arms $a_1$ and $a_2$ both approximately follow a normal distribution.
+
+    That is to say
+    $$\hat{r}_{a_1} \sim \mathcal{N}(\bar{r}_{a_1}, \sigma_1^2/n_e), \quad \hat{r}_{a_2} \sim \mathcal{N}(\bar{r}_{a_2}, \sigma_2^2/n_e),
+    $$
+    , where $\bar{r}_{a_i}$ are the true means, is a good approximation.
+
+    Then the difference of them follows
+    $$\hat{r}_{a_1} - \hat{r}_{a_2} \sim \mathcal{N}(\bar{r}_{a_1}-\bar{r}_{a_2}, \frac{\sigma_1^2+\sigma_2^2}{n_e}).
+    $$
+
+    For convenience, denote $\mu := \bar{r}_{a_1}-\bar{r}_{a_2}$ and $\sigma^2 := \sigma_1^2+\sigma_2^2$.
+
+    Following that, using the z-score and confidence level formulation, we know that generally for confidence intervel with probablity $1-\alpha$, there is
+    $$\Pr(|\hat{r}_{a_1} - \hat{r}_{a_2}| \le z_{\alpha/2} \frac{\sigma}{\sqrt{n_e}}) = 1 - \alpha,$$
+    $$\Pr(|\hat{r}_{a_1} - \hat{r}_{a_2}| > z_{\alpha/2} \frac{\sigma}{\sqrt{n_e}}) = \alpha.
+    $$
+
+    Compare it with a relaxed (sufficient) version of the inequality we want, similar with what was derived in sub problem (b):
+    $$\Pr(|\hat{r}_{a_1} - \hat{r}_{a_2}| > \frac{\epsilon}{2}) \le \delta',
+    $$
+
+    we can require that
+    $$\frac{\epsilon}{2} \ge z_{\delta'/2} \frac{\sigma}{\sqrt{n_e}},
+    $$
+
+    and hence for $n_e$ we obtain
+    $$\Rightarrow \frac{\epsilon^2}{4} \ge z_{\delta'/2}^2 \frac{\sigma^2}{n_e}
+    $$
+    $$\Rightarrow \frac{\epsilon^2}{4 z_{\delta'/2}^2 \sigma^2} \ge  \frac{1}{n_e}
+    $$
+    $$\Rightarrow n_e \ge \frac{4 z_{\delta'/2}^2 \sigma^2}{\epsilon^2} = \frac{4 z_{\delta'/2}^2 (\sigma_1^2+\sigma_2^2)}{\epsilon^2}.
+    $$
+
+    Therefore the total sample needed is at least 2 times of that, namely
+    $$\frac{2\cdot 4 z_{\delta'/2}^2 (\sigma_1^2+\sigma_2^2)}{\epsilon^2}.$$
+
+    If generalize it to a bandits problem with $|A|$ arms, it would be
+    $$\frac{|A| \cdot 4 z_{\delta'/2}^2 (\sigma^2)}{\epsilon^2},$$
+    where we assume a union bound on the variances $\sum \sigma_i^2 \le \sigma^2$ for all arms for easier comparison.
+
+    Compared with the Hoeffding Bound, CLT bound:
+    - Requires less total samples if the variances of arm rewards are small enough.
+    - Can be tighter than Hoeffding Bound.
+    - Is parametric and thus easier to use in optimizations, such as allocating more pulls to high-variance arms.
+    - Is sensitive to the variances of arms regarding sample complexity, and requires knowing them beforehand or having good approximations of them.
+    - Needs $n_e$ large enough to fulfill assumptions for the CLT.
+
+    So both have pros and cons. We might want to choose them according to the scenarios at hand.
+
+    Use CLT Bounds if:
+    - We have historical data or domain knowledge telling you rewards are roughly normal (e.g., physiological measurements, production yields).
+    - Sample budgets are large enough that the normal approximation is reliable.
+    - We can afford a mild risk of slight deviation from the nominal $\delta'$ in exchange for fewer samples.
+
+    Use Hoeffding Bounds if:
+    - Rewards are bounded but potentially very skewed or multimodal (e.g., click-through rates on ads).
+    - We need guaranteed finite-sample error control, without any distributional assumptions.
+    - Our sample budget is tight, and we can't afford the risk of an underestimated variance.
+
 :::
 
 ## Challenges of RLHF (5 pts)
@@ -626,7 +686,7 @@ RLHF and DPO leverage humans providing pairwise comparisons.
 3.  (2 pts)There are a number of limitations of RLHF. Please describe one here (different than parts a and b). You may find it interesting to read ["Open Problems and Fundamental Limitations of Reinforcement Learning from Human Feedback"](https://arxiv.org/pdf/2307.15217) and you are welcome to describe challenges listed there, or make up your own.
 
 ::: {.answer}
-1. Human raters for large-scale RLHF or DPO training on language models are often sourced from online platforms (like Mechanical Turk, Upwork, or specialized annotation companies). Typically they are adults from diverse but often underpaid gig economy workers or crowdworkers, sometimes from developing countries. They may have varying levels of education (from high school to some college) but rarely experts in the model's domain. This means the raters might be economically vulnerable, working for relatively low wages under potentially stressful or monotonous conditions.
+1. Human raters for large-scale RLHF or DPO training on language models are often sourced from online platforms, like Mechanical Turk, Upwork, or specialized annotation companies ([Putting the human touch on LLMs](https://radical.vc/putting-the-human-touch-on-llms/)). Typically they are adults from diverse but often underpaid gig economy workers or crowdworkers, sometimes from developing countries. They may have varying levels of education (from high school to some college) but rarely experts in the model's domain. This means the raters might be economically vulnerable, working for relatively low wages under potentially stressful or monotonous conditions.
 
     Based on this, I think there are at least these ethical issues:
 
