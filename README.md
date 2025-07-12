@@ -21,7 +21,7 @@ If further interested, [this link](https://web.stanford.edu/class/cs234/modules.
         - [By current author](#by-current-author)
             - [A1: RiverSwim](#a1-riverswim)
             - [A2: REINFORCE and PPO](#a2-reinforce-and-ppo)
-            - [A3](#a3)
+            - [A3: RLHF, DPO](#a3-rlhf-dpo)
     - [Personal notes](#personal-notes)
         - [Lecture notes](#lecture-notes)
         - [Assignment Notes](#assignment-notes)
@@ -115,9 +115,13 @@ This is a screenshot of output after running the filled-out program.
 
 > Written part is at [a2_text.pdf](./assignment_sub/a2_text.pdf).
 
-#### A3
+#### A3: RLHF, DPO
 
-**Q2.2**
+**Q2.2 e and g**
+
+Plot of rewards from running RLHF for 3 different seeds, original vs RLHF only.
+
+<img alt="A3 Q2.2 e plot" src="./assignment_sub/a3_code/results_rlhf/hopper_rlhf.png" width="300px">
 
 For brevity, only showing comparison of rollouts with one of the 3 seeds (seed 22).
 
@@ -127,7 +131,21 @@ For brevity, only showing comparison of rollouts with one of the 3 seeds (seed 2
 
 Worth noting that with RLHF, the leg in the rollout looks more "upright" and "humanly", and hops for longer distance before falling. 
 
-(TBC)
+**Q3.1 d and e**
+
+Plot of rewards from running DPO for 3 different seeds.
+
+<img alt="A3 Q3.1 d plot" src="./assignment_sub/a3_code/results_dpo/hopper_dpo.png" width="300px">
+
+Videos (converted to gifs) of DPO vs SFT rollouts. For brevity, only showing those for seed 22, an instance where DPO improvement is "average" out of the three seeds: less than in seed 33, more than in seed 11.
+
+| SFT  | DPO |
+| ----------- | ----------- |
+| <img alt="A3 q3 SFT" src="./assignment_sub/previews/a3_q3_sft.gif" width="220"> | <img alt="A3 q3 DPO" src="./assignment_sub/previews/a3_q3_dpo.gif" width="220"> |
+
+So overall the improvements are not visually exciting, but the rewards did get higher (compare with the organge curve there). Or maybe my implementation is problematic.
+
+> Written part is at [a3_text.pdf](./assignment_sub/a3_text.pdf).
 
 ## Personal notes
 
