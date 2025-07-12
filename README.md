@@ -81,17 +81,17 @@ These are preview of results produced by the original repo owner's work on these
 
 #### A1_P4: RiverSwim MDP
 
-<img alt="A1 problem 4 figure" src="./A1_code/RiverSwim_MDP.png" width="500px">
+<img alt="A1 problem 4 figure" src="https://github.com/Rhyme0730/CS234-Reinforcement-Learning/blob/main/A1_RiverSwim_MDP/RiverSwim_MDP.png?raw=true" width="500px">
 
 #### A2_P2: Policy Gradient Methods
 
-<img alt="A2 problem 2 figure" src="./A2_code/code/results/results-cartpole.png" width="300">
+<img alt="A2 problem 2 figure" src="https://github.com/Rhyme0730/CS234-Reinforcement-Learning/blob/main/A2_Policy_Gradient_Methods/code/results/results-cartpole.png?raw=true" width="300">
 
 #### A3_P1-P3: Reward engineering, RLHF, DPO
 
 | PPO (without early termination)  | PPO(with early termination) | RLHF |
 | ----------- | ----------- | ----------- |
-| <img alt="A3 problem 1 to 3 demo 1" src="./A3_code/results/Hopper-v3-early-termination=False-seed=1/video.gif" width="220"> | <img alt="A3 problem 1 to 3 demo 2" src="./A3_code/results/Hopper-v3-early-termination=True-seed=1/video.gif" width="220"> | <img alt="A3 problem 1 to 3 demo 3" src="./A3_code/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif" width="220"> |
+| <img alt="A3 problem 1 to 3 demo 1" src="https://github.com/Rhyme0730/CS234-Reinforcement-Learning/blob/main/A3_RLHF_DPO/results/Hopper-v3-early-termination=False-seed=1/video.gif?raw=true" width="220"> | <img alt="A3 problem 1 to 3 demo 2" src="https://github.com/Rhyme0730/CS234-Reinforcement-Learning/blob/main/A3_RLHF_DPO/results/Hopper-v3-early-termination=True-seed=1/video.gif?raw=true" width="220"> | <img alt="A3 problem 1 to 3 demo 3" src="https://github.com/Rhyme0730/CS234-Reinforcement-Learning/blob/main/A3_RLHF_DPO/results_rlhf/Hopper-v3-rlhf-seed=0/video.gif?raw=true" width="220"> |
 
 ---
 
@@ -143,7 +143,9 @@ Videos (converted to gifs) of DPO vs SFT rollouts. For brevity, only showing tho
 | ----------- | ----------- |
 | <img alt="A3 q3 SFT" src="./assignment_sub/previews/a3_q3_sft.gif" width="220"> | <img alt="A3 q3 DPO" src="./assignment_sub/previews/a3_q3_dpo.gif" width="220"> |
 
-So overall the improvements are not visually exciting, but the rewards did get higher (compare with the organge curve there). Or maybe my implementation is problematic.
+So overall the improvements are not visually exciting, but the rewards did get higher than in vanilla RLHF (see the organge curve in the Q2.2 e plot) in a much shorter time, which is maybe because it builds on top of SFT.
+
+The lower-than-expected visual improvements may be because less efficient hyperparameters in my experiments, like the $\beta$, learning rate, etc. A detailed conjecture about it is in my submission for the written part. Or maybe just that my implementation was problematic 😶‍🌫️.
 
 > Written part is at [a3_text.pdf](./assignment_sub/a3_text.pdf).
 
